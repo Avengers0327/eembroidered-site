@@ -166,23 +166,16 @@
         </div>
       </div>
     </div>
-    <div class="footer-bottom">© Everything Embroidered. All designs and photos are of original client work. <a href="#" id="staffGate" style="color:inherit; text-decoration:none; opacity:0.6; padding:4px 8px;" title="Staff access">&middot;&middot;&middot;</a></div>
+    <div class="footer-bottom">© Everything Embroidered. All designs and photos are of original client work. <a href="#" id="staffGate2" style="color:inherit; text-decoration:none; opacity:0.6; padding:4px 8px;" title="Staff access">&middot;&middot;&middot;</a></div>
   </div>
 </footer>
 
 <a href="tel:2019163221" class="sticky-call">📞 Call Now</a>
 
-<script src="gallery-config.js"></script>
-<script src="site.js" defer></script>
-</body>
-</html>
-
-<a href="tel:2019163221" class="sticky-call">📞 Call Now</a>
-
-<script src="gallery-config.js"></script>
-<script src="site.js" defer></script>
 <div class="form-toast" id="formToast"></div>
 
+<script src="gallery-config.js"></script>
+<script src="site.js" defer></script>
 <script>
 (function () {
   "use strict";
@@ -205,7 +198,7 @@
     form.addEventListener("submit", function (e) {
       e.preventDefault();
 
-      if (form.action.indexOf("https://formspree.io/f/xpqvvwnz") !== -1) {
+      if (form.action.indexOf("YOUR_FORM_ID") !== -1) {
         showToast("This form isn't set up yet — see SETUP.md.", true);
         return;
       }
