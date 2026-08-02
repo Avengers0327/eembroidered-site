@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Admin | Everything Embroidered</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { background: #F3EEE4; }
+
+  .admin-bar {
+    background: var(--navy);
+    color: #EFE7D8;
+    padding: 14px 0;
+  }
+  .admin-bar .container {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .admin-bar .brand { color: #fff; font-size: 1.15rem; }
+  .admin-bar .brand span { color: var(--thread-gold); }
+  .admin-bar .role {
+    font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--thread-gold); border: 1px solid rgba(201,154,68,0.5);
+    padding: 4px 12px; border-radius: 999px;
+  }
+  .admin-bar a.view-site { color: #C9C2B2; font-size: 0.9rem; }
+  .admin-bar a.view-site:hover { color: #fff; }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 32px 0 28px; }
+  .tab {
+    background: none; border: none; cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 0.98rem; font-weight: 600;
+    color: #7A7365; padding: 12px 20px; border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--navy); }
+  .tab.active { color: var(--navy); border-bottom-color: var(--terracotta); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card {
+    background: #fff; border-radius: var(--radius);
+    padding: 28px; box-shadow: var(--shadow); margin-bottom: 24px;
+  }
+  .card h2 { font-size: 1.5rem; margin-bottom: 6px; }
+  .card .sub { color: #57534A; font-size: 0.95rem; margin-bottom: 22px; }
+
+  .dropzone {
+    border: 2px dashed rgba(42,38,32,0.25);
+    border-radius: var(--radius);
+    padding: 44px 24px; text-align: center;
+    background: var(--cream); cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: var(--terracotta); background: #FFF8F1;
+  }
+  .dropzone .big { font-size: 1.05rem; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+  .dropzone .small { font-size: 0.88rem; color: #7A7365; }
+
+  .photo-list { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+  .photo-row {
+    display: grid; grid-template-columns: 64px 1fr auto;
+    gap: 14px; align-items: center;
+    background: var(--cream); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 12px;
+  }
+  .photo-row.is-new { border-color: var(--terracotta); background: #FFF8F1; }
+  .photo-row .thumb {
+    width: 64px; height: 64px; border-radius: 7px; overflow: hidden;
+    background: #E5DDCE; display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; color: #9A927F; text-align: center;
+  }
+  .photo-row .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-meta .fname {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.78rem; color: #7A7365; margin-bottom: 5px;
+    word-break: break-all;
+  }
+  .photo-meta input {
+    width: 100%; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+    padding: 7px 10px; border: 1.5px solid var(--line);
+    border-radius: 6px; background: #fff; color: var(--ink);
+  }
+  .photo-meta input:focus { outline: 2px solid var(--terracotta); outline-offset: 1px; }
+  .row-actions { display: flex; gap: 4px; }
+  .icon-btn {
+    background: #fff; border: 1.5px solid var(--line); cursor: pointer;
+    width: 32px; height: 32px; border-radius: 6px;
+    font-size: 0.9rem; color: var(--navy); line-height: 1;
+  }
+  .icon-btn:hover { border-color: var(--navy); }
+  .icon-btn.danger:hover { border-color: #B03A2E; color: #B03A2E; }
+  .icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .newflag {
+    display: inline-block; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--terracotta-dark); background: rgba(193,97,61,0.12);
+    padding: 2px 8px; border-radius: 999px; margin-bottom: 5px;
+  }
+
+  .btn-sm {
+    display: inline-block; padding: 11px 22px; border-radius: 999px;
+    font-weight: 600; font-size: 0.92rem; cursor: pointer;
+    border: none; font-family: 'Inter', sans-serif;
+  }
+  .btn-fill { background: var(--terracotta); color: #fff; }
+  .btn-fill:hover { background: var(--terracotta-dark); }
+  .btn-line { background: none; border: 1.5px solid var(--navy); color: var(--navy); }
+  .btn-line:hover { background: var(--navy); color: #fff; }
+  .action-bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 24px; }
+  .count { color: #7A7365; font-size: 0.9rem; }
+
+  .checklist { counter-reset: step; list-style: none; padding: 0; margin: 0; }
+  .checklist li {
+    counter-increment: step; position: relative;
+    padding: 0 0 18px 44px; color: #4A453C; font-size: 0.96rem;
+  }
+  .checklist li::before {
+    content: counter(step); position: absolute; left: 0; top: -2px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--navy); color: var(--thread-gold);
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 0.88rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .checklist li strong { color: var(--navy); }
+
+  pre.snippet {
+    background: var(--navy); color: #D8E3EC;
+    padding: 16px 18px; border-radius: 10px;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.8rem; overflow-x: auto; margin: 0 0 14px;
+  }
+
+  .note {
+    background: #FFF8F1; border-left: 3px solid var(--terracotta);
+    padding: 16px 18px; border-radius: 0 8px 8px 0;
+    font-size: 0.93rem; color: #4A453C;
+  }
+  .note strong { color: var(--navy); }
+
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+  .metric {
+    background: var(--cream); border: 1px solid var(--line);
+    border-radius: 10px; padding: 20px;
+  }
+  .metric .label {
+    font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #7A7365; font-weight: 600; margin-bottom: 8px;
+  }
+  .metric .value {
+    font-family: 'Fraunces', serif; font-size: 1.9rem;
+    color: #B8AF9C; line-height: 1;
+  }
+  .metric .hint { font-size: 0.8rem; color: #9A927F; margin-top: 8px; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--navy); color: #fff; padding: 13px 26px;
+    border-radius: 999px; font-size: 0.92rem; font-weight: 500;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.28); opacity: 0;
+    transition: transform 0.28s ease, opacity 0.28s ease; z-index: 99;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  .empty {
+    text-align: center; padding: 40px 20px; color: #7A7365; font-size: 0.95rem;
+  }
+
+  @media (max-width: 640px) {
+    .photo-row { grid-template-columns: 48px 1fr; }
+    .photo-row .row-actions { grid-column: 1 / -1; justify-content: flex-end; }
+    .photo-row .thumb { width: 48px; height: 48px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="admin-bar">
+  <div class="container">
+    <span class="brand">Everything <span>Embroidered</span></span>
+    <span class="role">Owner dashboard</span>
+    <a href="index.html" class="view-site">View live site →</a>
+  </div>
+</div>
+
+<div class="container" style="max-width:960px; padding-bottom:60px;">
+
+  <div class="tabs">
+    <button class="tab active" data-panel="gallery">Gallery</button>
+    <button class="tab" data-panel="analytics">Visitors</button>
+  </div>
+
+  <!-- ============ GALLERY ============ -->
+  <div class="panel active" id="gallery">
+
+    <div class="card">
+      <h2>Add photos to Our Work</h2>
+      <p class="sub">Drop in new photos, write a short description of each, and put them in the order you want them shown.</p>
+
+      <div class="dropzone" id="dropzone">
+        <div class="big">Drop photos here, or click to choose files</div>
+        <div class="small">JPG, PNG, or HEIC — you can add several at once</div>
+      </div>
+      <input type="file" id="filepick" accept="image/*" multiple hidden>
+
+      <div class="photo-list" id="photolist"></div>
+
+      <div class="action-bar">
+        <button class="btn-sm btn-fill" id="download">Save updated Our Work page</button>
+        <button class="btn-sm btn-line" id="copyhtml">Copy gallery code</button>
+        <span class="count" id="count"></span>
+      </div>
+    </div>
+
+    <div class="card" id="pendingcard" style="display:none;">
+      <h2>Two steps to finish</h2>
+      <p class="sub">Your new photos need to travel with the page.</p>
+      <ol class="checklist">
+        <li>Copy these files into your site's <strong>images</strong> folder:
+          <div style="margin-top:10px;">
+            <pre class="snippet" id="pendingnames"></pre>
+            <button class="btn-sm btn-line" id="copynames">Copy file names</button>
+          </div>
+        </li>
+        <li>Click <strong>Save updated Our Work page</strong> above, then replace the old <strong>work.html</strong> in your site folder with the one that downloads.</li>
+      </ol>
+    </div>
+
+    <div class="note">
+      <strong>Why the extra step?</strong> Your site is made of plain files with no server behind it, which is what keeps hosting free and the site fast. That also means this page can't copy photos into your folder for you. If you'd rather upload straight from your phone with no file copying, that needs a host with a built-in editor — worth doing, and a bigger change than this dashboard.
+    </div>
+
+  </div>
+
+  <!-- ============ ANALYTICS ============ -->
+  <div class="panel" id="analytics">
+
+    <div class="card">
+      <h2>Visitor numbers</h2>
+      <p class="sub">Nothing is counting your visitors yet. Here's what you'll see once tracking is on.</p>
+
+      <div class="metric-grid">
+        <div class="metric">
+          <div class="label">Visits</div>
+          <div class="value">—</div>
+          <div class="hint">Times someone opened your site</div>
+        </div>
+        <div class="metric">
+          <div class="label">Unique visitors</div>
+          <div class="value">—</div>
+          <div class="hint">Separate people, not repeat trips</div>
+        </div>
+        <div class="metric">
+          <div class="label">Page views</div>
+          <div class="value">—</div>
+          <div class="hint">Pages opened in total</div>
+        </div>
+        <div class="metric">
+          <div class="label">Top pages</div>
+          <div class="value">—</div>
+          <div class="hint">What people look at most</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Turn on tracking</h2>
+      <p class="sub">Cloudflare Web Analytics is free, needs no cookie banner, and doesn't slow your site down.</p>
+
+      <ol class="checklist">
+        <li>Make a free account at <strong>cloudflare.com</strong>, then open <strong>Web Analytics</strong> and add your site's address.</li>
+        <li>Cloudflare hands you a short snippet that looks like this, with your own token filled in:
+          <pre class="snippet" style="margin-top:10px;">&lt;script defer
+  src="https://static.cloudflareinsights.com/beacon.min.js"
+  data-cf-beacon='{"token": "YOUR_TOKEN_HERE"}'&gt;
+&lt;/script&gt;</pre>
+        </li>
+        <li>Paste that snippet just before the closing <strong>&lt;/body&gt;</strong> tag on every page — index, about, work, testimonials, bulk, faq, and contact.</li>
+        <li>Wait about a day, then read your numbers on the Cloudflare dashboard.</li>
+      </ol>
+
+      <div class="note" style="margin-top:8px;">
+        <strong>Want me to do step 3?</strong> Send me your token and I'll paste the snippet into all seven pages and hand them back ready to upload.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Other options</h2>
+      <p class="sub">All three do the same job. Pick on price and taste.</p>
+      <ul style="margin:0; padding-left:20px; color:#4A453C; font-size:0.96rem;">
+        <li style="margin-bottom:10px;"><strong>Cloudflare Web Analytics</strong> — free, privacy-friendly, no cookie banner needed.</li>
+        <li style="margin-bottom:10px;"><strong>Netlify Analytics</strong> — about $9/month, built in if you host there, counts visitors your competitors' ad blockers would hide.</li>
+        <li><strong>Google Analytics</strong> — free and very detailed, but heavier, and it needs a cookie banner.</li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var photos = [
+    { file: "eisenhower.jpg", alt: "Eisenhower Class of 2017 bulldog towel" },
+    { file: "godbless.jpg", alt: "God Bless baptism towel" },
+    { file: "jersey.jpg", alt: "Browns Morristown custom jersey" },
+    { file: "njit.jpg", alt: "NJIT graduation stole" },
+    { file: "1stchiristmas.jpg", alt: "First Christmas as Mom and Dad shirts" },
+    { file: "stocking1.jpg", alt: "Personalized Christmas stocking" },
+    { file: "62567630508__8DEE050C-477C-45CC-B2F4-5B8CB7AAE685.JPEG", alt: "Custom embroidered piece" },
+    { file: "FullSizeRender.JPEG", alt: "Custom embroidery work" },
+    { file: "IMG_1556.jpg", alt: "Custom embroidered work" },
+    { file: "IMG_1559.jpg", alt: "Custom embroidered work" },
+    { file: "IMG_2302.JPG", alt: "Custom embroidered work" },
+    { file: "IMG_6224.jpg", alt: "Custom sneakers" },
+    { file: "IMG_7085.jpg", alt: "Custom embroidered work" },
+    { file: "IMG_8448.jpg", alt: "Custom embroidered work" },
+    { file: "IMG_9914.JPEG", alt: "Custom embroidered work" },
+    { file: "santahat.jpg", alt: "Personalized Santa hat" },
+    { file: "blanket.jpg", alt: "Personalized knit blanket" },
+    { file: "stockings2.jpeg", alt: "Personalized stockings" },
+    { file: "captain.jpeg", alt: "Varsity jacket Captain patch" },
+    { file: "cbj.jpeg", alt: "Custom monogram embroidery" },
+    { file: "elephant.jpg", alt: "Personalized baby elephant plush" },
+    { file: "luggagetags.jpg", alt: "Custom luggage tags" },
+    { file: "puppy.JPG", alt: "Personalized baby blanket" },
+    { file: "golfbag.jpg", alt: "Custom embroidered golf bag" },
+    { file: "IMG_7577.JPG", alt: "Custom sneakers" },
+    { file: "wedding.jpg", alt: "Custom wedding table linens" },
+    { file: "monogram.jpg", alt: "Custom monogrammed towel" },
+    { file: "mommug.jpg", alt: "Personalized mom mug" },
+    { file: "liontiger.jpg", alt: "Eye of the Tiger embroidered sweatshirt" },
+    { file: "bag.jpg", alt: "Custom luggage tags" }
+  ];
+
+  var el = function (id) { return document.getElementById(id); };
+  var list = el("photolist");
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function toast(msg) {
+    var t = el("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._t);
+    t._t = setTimeout(function () { t.classList.remove("show"); }, 2600);
+  }
+
+  function render() {
+    list.innerHTML = "";
+
+    if (!photos.length) {
+      list.innerHTML = '<div class="empty">No photos yet. Drop some in above to get started.</div>';
+    }
+
+    photos.forEach(function (p, i) {
+      var row = document.createElement("div");
+      row.className = "photo-row" + (p.isNew ? " is-new" : "");
+
+      var thumb = p.preview
+        ? '<img src="' + p.preview + '" alt="">'
+        : '<img src=' + esc(p.file) + '"images_fallback/" alt="" onerror="this.replaceWith(document.createTextNode(\'not found\'))">';
+
+      row.innerHTML =
+        '<div class="thumb">' + thumb + '</div>' +
+        '<div class="photo-meta">' +
+          (p.isNew ? '<span class="newflag">New</span>' : '') +
+          '<div class="fname">' + esc(p.file) + '</div>' +
+          '<input type="text" value="' + esc(p.alt) + '" data-i="' + i + '" ' +
+            'placeholder="Describe this photo, e.g. Embroidered team jacket">' +
+        '</div>' +
+        '<div class="row-actions">' +
+          '<button class="icon-btn" data-up="' + i + '" ' + (i === 0 ? "disabled" : "") + ' title="Move up">↑</button>' +
+          '<button class="icon-btn" data-down="' + i + '" ' + (i === photos.length - 1 ? "disabled" : "") + ' title="Move down">↓</button>' +
+          '<button class="icon-btn danger" data-del="' + i + '" title="Remove">✕</button>' +
+        '</div>';
+
+      list.appendChild(row);
+    });
+
+    el("count").textContent = photos.length + (photos.length === 1 ? " photo" : " photos");
+
+    var pending = photos.filter(function (p) { return p.isNew; });
+    el("pendingcard").style.display = pending.length ? "block" : "none";
+    el("pendingnames").textContent = pending.map(function (p) { return p.file; }).join("\n");
+  }
+
+  list.addEventListener("input", function (e) {
+    var i = e.target.getAttribute("data-i");
+    if (i !== null) { photos[+i].alt = e.target.value; }
+  });
+
+  list.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    var up = b.getAttribute("data-up"),
+        down = b.getAttribute("data-down"),
+        del = b.getAttribute("data-del");
+
+    if (up !== null) {
+      var i = +up; var tmp = photos[i - 1]; photos[i - 1] = photos[i]; photos[i] = tmp;
+    } else if (down !== null) {
+      var j = +down; var t2 = photos[j + 1]; photos[j + 1] = photos[j]; photos[j] = t2;
+    } else if (del !== null) {
+      photos.splice(+del, 1);
+    } else { return; }
+    render();
+  });
+
+  function addFiles(files) {
+    var added = 0;
+    Array.prototype.forEach.call(files, function (f) {
+      if (!/^image\//.test(f.type) && !/\.(jpe?g|png|heic|webp|gif)$/i.test(f.name)) return;
+      if (photos.some(function (p) { return p.file === f.name; })) return;
+      photos.push({
+        file: f.name,
+        alt: "",
+        isNew: true,
+        preview: URL.createObjectURL(f)
+      });
+      added++;
+    });
+    render();
+    if (added) {
+      toast(added + (added === 1 ? " photo added" : " photos added") + " — add a description for each");
+    } else {
+      toast("Those photos are already in the gallery");
+    }
+  }
+
+  var dz = el("dropzone"), picker = el("filepick");
+  dz.addEventListener("click", function () { picker.click(); });
+  picker.addEventListener("change", function (e) { addFiles(e.target.files); picker.value = ""; });
+  ["dragenter", "dragover"].forEach(function (ev) {
+    dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add("drag"); });
+  });
+  ["dragleave", "drop"].forEach(function (ev) {
+    dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove("drag"); });
+  });
+  dz.addEventListener("drop", function (e) {
+    if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
+  });
+
+  function galleryHTML() {
+    return photos.map(function (p) {
+      var alt = p.alt && p.alt.trim() ? p.alt.trim() : "Custom embroidery work";
+      return '      <figure><img src=' + esc(p.file) + '"images_fallback/" alt="' + esc(alt) + '"></figure>';
+    }).join("\n");
+  }
+
+  function copy(text, msg) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); toast(msg); }
+    catch (err) { toast("Couldn't copy — select the text and copy it manually"); }
+    document.body.removeChild(ta);
+  }
+
+  el("copyhtml").addEventListener("click", function () {
+    copy(galleryHTML(), "Gallery code copied");
+  });
+
+  el("copynames").addEventListener("click", function () {
+    copy(el("pendingnames").textContent, "File names copied");
+  });
+
+  var PAGE_TOP =
+'<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n' +
+'<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+'<title>Our Work | Everything Embroidered</title>\n' +
+'<meta name="description" content="Browse our gallery of custom embroidery and printing work \u2014 apparel, gifts, holiday decor, sports gear, and more.">\n' +
+'<link rel="stylesheet" href="style.css">\n</head>\n<body>\n\n' +
+'<div class="call-strip">Call or text us at <a href="tel:2019163221">(201) 916-3221</a> &nbsp;\u00b7&nbsp; 700 Paramus Park, Paramus, NJ</div>\n\n' +
+'<header class="site-header">\n  <div class="container nav-wrap">\n' +
+'    <a href="index.html" class="brand">Everything <span>Embroidered</span></a>\n' +
+'    <button class="menu-toggle" aria-label="Toggle menu" onclick="document.querySelector(\'.main-nav\').classList.toggle(\'open\')">\u2630</button>\n' +
+'    <nav class="main-nav">\n' +
+'      <a href="index.html" class="stitch-underline">Home</a>\n' +
+'      <a href="about.html" class="stitch-underline">About</a>\n' +
+'      <a href="work.html" class="stitch-underline active">Our Work</a>\n' +
+'      <a href="testimonials.html" class="stitch-underline">Testimonials</a>\n' +
+'      <a href="bulk.html" class="stitch-underline">Bulk &amp; Corporate</a>\n' +
+'      <a href="faq.html" class="stitch-underline">FAQs</a>\n' +
+'      <a href="contact.html" class="nav-cta">Get a Quote</a>\n' +
+'    </nav>\n  </div>\n</header>\n\n' +
+'<section class="page-hero" style="padding-bottom:30px;">\n' +
+'  <div class="container" style="text-align:center; max-width:680px;">\n' +
+'    <div class="hero-eyebrow">Be inspired</div>\n' +
+'    <h1>Our Work</h1>\n' +
+'    <p class="lede">A look at what we\'ve made for families, teams, and businesses \u2014 every piece custom, every order personal.</p>\n' +
+'  </div>\n</section>\n\n' +
+'<section class="section" style="padding-top:20px;">\n  <div class="container">\n    <div class="gallery">\n';
+
+  var PAGE_BOTTOM =
+'\n    </div>\n  </div>\n</section>\n\n' +
+'<section class="section section-alt" style="text-align:center;">\n  <div class="container">\n' +
+'    <h2>See something you love?</h2>\n' +
+'    <p style="max-width:480px; margin:0 auto 26px; color:#4A453C;">Every piece here started as someone\'s idea. Let\'s talk about yours.</p>\n' +
+'    <a href="contact.html" class="btn btn-primary">Get your free quote</a>\n  </div>\n</section>\n\n' +
+'<footer class="site-footer">\n  <div class="container">\n    <div class="footer-grid">\n' +
+'      <div>\n        <h4>Everything Embroidered</h4>\n' +
+'        <p>700 Paramus Park, Paramus, NJ 07662<br>everythingembroidered@hotmail.com<br><a href="tel:2019163221"><strong><u>(201) 916-3221</u></strong></a></p>\n      </div>\n' +
+'      <div>\n        <h4>Explore</h4>\n        <div class="footer-links">\n' +
+'          <a href="about.html">About</a>\n          <a href="work.html">Our Work</a>\n' +
+'          <a href="testimonials.html">Testimonials</a>\n' +
+'          <a href="bulk.html">Bulk &amp; Corporate</a>\n          <a href="faq.html">FAQs</a>\n' +
+'        </div>\n      </div>\n' +
+'      <div>\n        <h4>Get in touch</h4>\n        <div class="footer-links">\n' +
+'          <a href="contact.html">Request a Quote</a>\n' +
+'          <a href="https://www.facebook.com/everythingembroidered11">Facebook</a>\n' +
+'        </div>\n      </div>\n    </div>\n' +
+'    <div class="footer-bottom">\u00a9 Everything Embroidered. All designs and photos are of original client work.</div>\n' +
+'  </div>\n</footer>\n\n' +
+'<a href="tel:2019163221" class="sticky-call">\ud83d\udcde Call Now</a>\n\n</body>\n</html>\n';
+
+  el("download").addEventListener("click", function () {
+    if (!photos.length) { toast("Add at least one photo first"); return; }
+
+    var missing = photos.filter(function (p) { return !p.alt || !p.alt.trim(); }).length;
+    var html = PAGE_TOP + galleryHTML() + PAGE_BOTTOM;
+
+    var blob = new Blob([html], { type: "text/html" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "work.html";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+
+    if (missing) {
+      toast("Saved. " + missing + " photo" + (missing === 1 ? "" : "s") + " still need a description");
+    } else {
+      toast("Saved — replace work.html in your site folder");
+    }
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (tab) {
+    tab.addEventListener("click", function () {
+      document.querySelectorAll(".tab").forEach(function (t) { t.classList.remove("active"); });
+      document.querySelectorAll(".panel").forEach(function (p) { p.classList.remove("active"); });
+      tab.classList.add("active");
+      el(tab.getAttribute("data-panel")).classList.add("active");
+    });
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
