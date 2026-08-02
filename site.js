@@ -42,12 +42,12 @@
     try { unlocked = localStorage.getItem(KEY) === "1"; } catch (e) {}
     if (unlocked) showButton();
 
-    var gate = document.getElementById("staffGate");
-    if (gate) {
+    var gates = document.querySelectorAll("#staffGate, #staffGate2, .staff-gate");
+    gates.forEach(function (gate) {
       gate.addEventListener("click", function (e) {
         e.preventDefault();
         unlock();
       });
-    }
+    });
   });
 })();
