@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Photos | Everything Embroidered</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+  body { background: #F3EEE4; }
+
+  .up-bar {
+    background: var(--navy);
+    color: #fff;
+    padding: 18px 0;
+    text-align: center;
+  }
+  .up-bar .name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+  }
+  .up-bar .name span { color: var(--thread-gold); }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  h1 { font-size: clamp(2rem, 6vw, 2.8rem); text-align: center; margin-bottom: 10px; }
+  .intro {
+    text-align: center; font-size: 1.15rem; color: #4A453C;
+    margin-bottom: 34px;
+  }
+
+  .big-button {
+    display: block; width: 100%;
+    background: var(--terracotta); color: #fff;
+    border: none; border-radius: 20px;
+    padding: 42px 24px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.5rem; font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(193,97,61,0.32);
+    transition: background 0.2s ease, transform 0.15s ease;
+    line-height: 1.3;
+  }
+  .big-button:hover { background: var(--terracotta-dark); }
+  .big-button:active { transform: scale(0.985); }
+  .big-button:disabled { background: #B5AC9B; box-shadow: none; cursor: default; }
+  .big-button .sub {
+    display: block; font-size: 1rem; font-weight: 500;
+    opacity: 0.9; margin-top: 8px;
+  }
+
+  .status { margin-top: 30px; }
+
+  .item {
+    display: flex; align-items: center; gap: 16px;
+    background: #fff; border-radius: 14px;
+    padding: 14px 18px; margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    font-size: 1.05rem;
+  }
+  .item .pic {
+    width: 58px; height: 58px; border-radius: 10px;
+    object-fit: cover; flex-shrink: 0; background: #E5DDCE;
+  }
+  .item .txt { flex: 1; min-width: 0; }
+  .item .fname {
+    color: #7A7365; font-size: 0.85rem;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .item .state { font-weight: 600; }
+  .item.ok .state { color: #2E7D4F; }
+  .item.err .state { color: #B03A2E; }
+  .item.busy .state { color: #7A7365; }
+
+  .done-box {
+    background: #E8F3EC; border: 2px solid #2E7D4F;
+    border-radius: 18px; padding: 30px 26px;
+    text-align: center; margin-top: 30px;
+  }
+  .done-box .tick { font-size: 3rem; line-height: 1; margin-bottom: 12px; }
+  .done-box h2 { color: #2E7D4F; font-size: 1.6rem; margin-bottom: 8px; }
+  .done-box p { color: #33604A; font-size: 1.08rem; margin-bottom: 20px; }
+  .done-box a {
+    display: inline-block; background: var(--navy); color: #fff;
+    padding: 15px 30px; border-radius: 999px;
+    font-weight: 600; font-size: 1.05rem;
+  }
+
+  .trouble {
+    background: #FFF3F1; border: 2px solid #B03A2E;
+    border-radius: 18px; padding: 26px;
+    margin-top: 30px; display: none;
+  }
+  .trouble h2 { color: #B03A2E; font-size: 1.3rem; }
+  .trouble p { color: #7A3229; font-size: 1.02rem; margin-bottom: 0; }
+
+  .back {
+    display: block; text-align: center; margin-top: 40px;
+    color: #7A7365; font-size: 1rem;
+  }
+  .back:hover { color: var(--navy); }
+
+  .setup-warning {
+    background: #FFF8E8; border: 2px solid var(--thread-gold);
+    border-radius: 16px; padding: 24px; margin-bottom: 30px;
+  }
+  .setup-warning h2 { font-size: 1.2rem; margin-bottom: 8px; }
+  .setup-warning p { font-size: 1rem; color: #6B5B33; margin-bottom: 0; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="up-bar">
+  <div class="name">Everything <span>Embroidered</span></div>
+</div>
+
+<div class="wrap">
+
+  <div id="setupWarn" class="setup-warning" style="display:none;">
+    <h2>Not set up yet</h2>
+    <p>This page still needs its one-time setup before photos can be added. Whoever built the site needs to fill in <strong>gallery-config.js</strong>.</p>
+  </div>
+
+  <h1>Add photos to the website</h1>
+  <p class="intro">Pick photos from this device. They go straight onto the Our Work page — nothing else to do.</p>
+
+  <button class="big-button" id="pickBtn">
+    📷 Choose Photos
+    <span class="sub">You can pick more than one</span>
+  </button>
+  <input type="file" id="picker" accept="image/*" multiple hidden>
+
+  <div class="status" id="status"></div>
+
+  <div class="done-box" id="doneBox" style="display:none;">
+    <div class="tick">✓</div>
+    <h2 id="doneTitle">All done!</h2>
+    <p id="doneText">Your photos are on the website now.</p>
+    <a href="work.html">See them on the website</a>
+  </div>
+
+  <div class="trouble" id="trouble">
+    <h2>Something went wrong</h2>
+    <p id="troubleText"></p>
+  </div>
+
+  <a href="index.html" class="back">← Back to the website</a>
+
+</div>
+
+<script src="gallery-config.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var cfg = window.GALLERY_CONFIG || {};
+  var ready = cfg.cloudName && cfg.cloudName.indexOf("PASTE_") !== 0 &&
+              cfg.uploadPreset && cfg.uploadPreset.indexOf("PASTE_") !== 0;
+
+  var pickBtn = document.getElementById("pickBtn");
+  var picker  = document.getElementById("picker");
+  var statusEl = document.getElementById("status");
+  var doneBox = document.getElementById("doneBox");
+  var doneTitle = document.getElementById("doneTitle");
+  var doneText = document.getElementById("doneText");
+  var trouble = document.getElementById("trouble");
+  var troubleText = document.getElementById("troubleText");
+
+  if (!ready) {
+    document.getElementById("setupWarn").style.display = "block";
+    pickBtn.disabled = true;
+    pickBtn.innerHTML = "Setup needed first";
+  }
+
+  pickBtn.addEventListener("click", function () { picker.click(); });
+
+  picker.addEventListener("change", function (e) {
+    var files = Array.prototype.slice.call(e.target.files || []);
+    picker.value = "";
+    if (!files.length) return;
+    startUpload(files);
+  });
+
+  function startUpload(files) {
+    statusEl.innerHTML = "";
+    doneBox.style.display = "none";
+    trouble.style.display = "none";
+    pickBtn.disabled = true;
+    pickBtn.innerHTML = "Adding your photos…";
+
+    var rows = files.map(function (f) { return makeRow(f); });
+    var okCount = 0, failCount = 0, finished = 0;
+
+    files.forEach(function (file, i) {
+      uploadOne(file, function (err) {
+        finished++;
+        if (err) {
+          failCount++;
+          rows[i].className = "item err";
+          rows[i].querySelector(".state").textContent = "Didn't work";
+        } else {
+          okCount++;
+          rows[i].className = "item ok";
+          rows[i].querySelector(".state").textContent = "Added ✓";
+        }
+        if (finished === files.length) allDone(okCount, failCount);
+      });
+    });
+  }
+
+  function makeRow(file) {
+    var row = document.createElement("div");
+    row.className = "item busy";
+    var url = URL.createObjectURL(file);
+    row.innerHTML =
+      '<img class="pic" src="' + url + '" alt="">' +
+      '<div class="txt">' +
+        '<div class="state">Adding…</div>' +
+        '<div class="fname"></div>' +
+      '</div>';
+    row.querySelector(".fname").textContent = file.name;
+    statusEl.appendChild(row);
+    return row;
+  }
+
+  function uploadOne(file, done) {
+    var form = new FormData();
+    form.append("file", file);
+    form.append("upload_preset", cfg.uploadPreset);
+    form.append("tags", cfg.tag || "ourwork");
+
+    fetch("https://api.cloudinary.com/v1_1/" + cfg.cloudName + "/image/upload", {
+      method: "POST",
+      body: form
+    })
+    .then(function (r) {
+      if (!r.ok) throw new Error("upload rejected (" + r.status + ")");
+      return r.json();
+    })
+    .then(function () { done(null); })
+    .catch(function (err) { done(err); });
+  }
+
+  function allDone(ok, fail) {
+    pickBtn.disabled = false;
+    pickBtn.innerHTML = '📷 Choose More Photos<span class="sub">You can pick more than one</span>';
+
+    if (ok > 0) {
+      doneTitle.textContent = ok === 1 ? "Photo added!" : ok + " photos added!";
+      doneText.textContent = "They're on the Our Work page now. It can take a minute for them to show up.";
+      doneBox.style.display = "block";
+    }
+
+    if (fail > 0) {
+      troubleText.textContent = fail === 1
+        ? "One photo didn't upload. Check the internet connection and try that one again."
+        : fail + " photos didn't upload. Check the internet connection and try them again.";
+      trouble.style.display = "block";
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
