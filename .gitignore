@@ -1,0 +1,16 @@
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor junk
+.vscode/
+.idea/
+*.swp
+
+# Local admin tool — has no secrets in it, but never belongs on the live site
+admin.html
+
+# If you ever add build tooling later
+node_modules/
+.env
