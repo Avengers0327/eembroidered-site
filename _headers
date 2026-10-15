@@ -1,0 +1,8 @@
+/admin
+  X-Robots-Tag: noindex, nofollow
+/admin.html
+  X-Robots-Tag: noindex, nofollow
+/upload
+  X-Robots-Tag: noindex, nofollow
+/upload.html
+  X-Robots-Tag: noindex, nofollow
