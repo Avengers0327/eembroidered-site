@@ -27,8 +27,8 @@
 
       var html = items.map(function (r) {
         var src = "https://res.cloudinary.com/" + cfg.cloudName +
-                  "/image/upload/f_auto,q_auto,w_900/v" + r.version +
-                  "/" + r.public_id + "." + r.format;
+                  "/image/upload/f_auto,q_auto,w_900/v" + encodeURIComponent(r.version) +
+                  "/" + encodeURI(r.public_id) + "." + encodeURIComponent(r.format);
         return '<figure><img src="' + src + '" alt="Custom embroidery work by Everything Embroidered" loading="lazy"></figure>';
       }).join("");
 

@@ -5,7 +5,7 @@
 
   function password() {
     var cfg = window.GALLERY_CONFIG || {};
-    return cfg.password || "ThreadAndNeedle1";
+    return cfg.password || null;
   }
 
   function showButton() {
@@ -28,7 +28,7 @@
   function unlock() {
     var entered = window.prompt("Staff password:");
     if (entered === null) return;
-    if (entered === password()) {
+    if (password() && entered === password()) {
       try { localStorage.setItem(KEY, "1"); } catch (e) {}
       showButton();
       window.alert("You're in! Look for the orange Add Photos button in the corner from now on.");
