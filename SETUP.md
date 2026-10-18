@@ -174,3 +174,22 @@ email, category, quantity, deadline, project details) as plain readable text.
 After submitting, visitors see a small confirmation toast slide up at the
 bottom of the page — no reload, no redirect, they just stay right where they
 are.
+---
+
+## Admin page (delete photos)
+
+`/admin` lets staff log in, add photos, and delete photos from the Our Work page.
+Deleting needs Cloudinary's secret key, so it runs through a small Cloudflare
+Pages Function (`functions/api/photos.js`). The secret stays on Cloudflare,
+never in the browser.
+
+One-time setup: Cloudflare dashboard → Workers & Pages → **eembroidered** →
+**Settings → Variables and Secrets** → add these for **Production**, type **Secret**:
+
+| Name | Value |
+|---|---|
+| `ADMIN_PASSWORD` | the admin password (make it long) |
+| `CLOUDINARY_API_KEY` | Cloudinary → Settings → API Keys |
+| `CLOUDINARY_API_SECRET` | same place |
+
+Then **Deployments → Retry deployment** on the latest one so it picks them up.
