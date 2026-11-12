@@ -34,19 +34,19 @@ export default {
 
   // shape: which photo the designer shows (null = no live preview, the
   // customer just describes it). image: photo used when there is no shape.
-  // sized: asks for a size. blurb: the short description on the product page.
+  // defaultColor: the colour shown first in the shop. sized: asks for a size. blurb: the short description on the product page.
   products: [
-    { id: "tshirt",  name: "Custom T-Shirt", from: 25, shape: "tshirt", sized: true,
+    { id: "tshirt", defaultColor: "Navy",  name: "Custom T-Shirt", from: 25, shape: "tshirt", sized: true,
       blurb: "A classic tee with your logo, name or design. Add it below and see it on the shirt before you order." },
-    { id: "polo",    name: "Custom Polo Shirt", from: 25, shape: "polo", sized: true,
+    { id: "polo", defaultColor: "Red",    name: "Custom Polo Shirt", from: 25, shape: "polo", sized: true,
       blurb: "A collared polo for work, teams and events, with your logo on the chest." },
-    { id: "hoodie",  name: "Custom Hoodie", from: 25, shape: "hoodie", sized: true,
+    { id: "hoodie", defaultColor: "Forest",  name: "Custom Hoodie", from: 25, shape: "hoodie", sized: true,
       blurb: "A pullover hoodie with your logo, name or design on the front." },
-    { id: "hat",     name: "Custom Hat", from: 25, shape: "hat", sized: false,
+    { id: "hat", defaultColor: "Royal",     name: "Custom Hat", from: 25, shape: "hat", sized: false,
       blurb: "A baseball cap with your logo or words on the front." },
-    { id: "tote",    name: "Custom Tote Bag", from: 25, shape: "tote", sized: false,
+    { id: "tote", defaultColor: "Tan",    name: "Custom Tote Bag", from: 25, shape: "tote", sized: false,
       blurb: "A tote bag with your logo, monogram or design." },
-    { id: "towel",   name: "Custom Towel or Blanket", from: 25, shape: "towel", sized: false,
+    { id: "towel", defaultColor: "Pink",   name: "Custom Towel or Blanket", from: 25, shape: "towel", sized: false,
       blurb: "A towel or blanket with a name, monogram or design." },
     { id: "stocking", name: "Personalized Christmas Stocking", from: 20, shape: null, sized: false,
       image: "/images_fallback/stockings1.jpg",

@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shop | Everything Embroidered</title>
-<link rel="stylesheet" href="style.css?v=202611112222">
-<link rel="stylesheet" href="staff.css?v=202611112222">
+<link rel="stylesheet" href="style.css?v=202611112243">
+<link rel="stylesheet" href="staff.css?v=202611112243">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -49,6 +49,7 @@
   }
   .p-card:hover .p-tile { background: #E3DCCD; }
   .p-tile img { width: 78%; height: 78%; object-fit: contain; transition: transform 0.3s ease; filter: drop-shadow(0 10px 14px rgba(28,43,58,0.18)); }
+  .p-tile img[src=""] { visibility: hidden; }
   .p-tile img.cover { width: 100%; height: 100%; object-fit: cover; filter: none; }
   .p-card:hover .p-tile img { transform: scale(1.04); }
   .p-badge {
@@ -59,7 +60,8 @@
   .p-name { font-weight: 500; color: var(--ink); margin: 12px 0 2px; font-size: 1rem; }
   .p-price { font-weight: 600; color: var(--navy); font-size: 0.98rem; }
   .p-dots { display: flex; gap: 6px; margin-top: 10px; align-items: center; }
-  .p-dots i { width: 15px; height: 15px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.25); display: block; }
+  .p-dots i { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.25); display: block; cursor: pointer; }
+  .p-dots i.on { box-shadow: 0 0 0 2px var(--cream), 0 0 0 3.5px var(--navy); }
   .p-dots span { font-size: 0.8rem; color: #7A7365; }
 
   /* ---------- product page ---------- */
@@ -382,9 +384,9 @@
   </div>
 </footer>
 
-<script src="gallery-config.js?v=202611112222"></script>
-<script src="staff.js?v=202611112222"></script>
-<script src="designer.js?v=202611112222"></script>
+<script src="gallery-config.js?v=202611112243"></script>
+<script src="staff.js?v=202611112243"></script>
+<script src="designer.js?v=202611112243"></script>
 <script>
 (function () {
   "use strict";
@@ -409,23 +411,75 @@
   function photoOf(p) { return p.shape ? "/mockups/" + p.shape + ".webp" : (p.image || "/images_fallback/spools.jpg"); }
 
   /* ---------- shop grid ---------- */
+  var tintCache = {}, photoCache = {};
+  function colorByName(n) { return shop.colors.filter(function (c) { return c.name === n; })[0] || shop.colors[0]; }
+
+  // Dye the white photo the chosen colour (multiply keeps every fold and shadow).
+  function tintedSrc(src, hex, cb) {
+    var key = src + hex;
+    if (tintCache[key]) { cb(tintCache[key]); return; }
+    var go = function (img) {
+      var c = document.createElement("canvas");
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      var x = c.getContext("2d");
+      x.filter = "contrast(1.18)";
+      x.drawImage(img, 0, 0);
+      x.filter = "none";
+      if (hex.toUpperCase() !== "#FFFFFF") {
+        x.globalCompositeOperation = "multiply"; x.fillStyle = hex; x.fillRect(0, 0, c.width, c.height);
+        x.globalCompositeOperation = "destination-in"; x.drawImage(img, 0, 0);
+      }
+      tintCache[key] = c.toDataURL("image/webp", 0.85);
+      cb(tintCache[key]);
+    };
+    if (photoCache[src]) { go(photoCache[src]); return; }
+    var im = new Image();
+    im.onload = function () { photoCache[src] = im; go(im); };
+    im.src = src;
+  }
+
   function paintGrid() {
     $("grid").innerHTML = shop.products.map(function (p) {
+      var def = colorByName(p.defaultColor);
       var dots = p.shape
-        ? '<div class="p-dots">' + shop.colors.slice(0, 5).map(function (c) { return '<i style="background:' + c.hex + '"></i>'; }).join("") +
-          (shop.colors.length > 5 ? "<span>+" + (shop.colors.length - 5) + "</span>" : "") + "</div>"
+        ? '<div class="p-dots">' + shop.colors.slice(0, 6).map(function (c) {
+            return '<i data-color="' + esc(c.name) + '" style="background:' + c.hex + '"' + (c === def ? ' class="on"' : "") + ' title="' + esc(c.name) + '"></i>';
+          }).join("") + (shop.colors.length > 6 ? "<span>+" + (shop.colors.length - 6) + "</span>" : "") + "</div>"
         : "";
-      return '<a class="p-card" href="#/p/' + p.id + '">' +
+      return '<a class="p-card" data-id="' + p.id + '" href="#/p/' + p.id + '">' +
         '<div class="p-tile">' + (p.shape ? '<span class="p-badge">Design it live</span>' : "") +
-        '<img loading="lazy" src="' + photoOf(p) + '" alt="' + esc(p.name) + '"' + (p.shape ? "" : ' class="cover"') + "></div>" +
+        '<img loading="lazy" src="' + (p.shape ? "" : photoOf(p)) + '" alt="' + esc(p.name) + '"' + (p.shape ? "" : ' class="cover"') + "></div>" +
         '<div class="p-name">' + esc(p.name) + "</div>" +
         '<div class="p-price">' + price(p) + "</div>" + dots + "</a>";
     }).join("");
+    shop.products.forEach(function (p) {
+      if (p.shape) paintTile(p, colorByName(p.defaultColor));
+    });
   }
+  function paintTile(p, color) {
+    var card = document.querySelector('.p-card[data-id="' + p.id + '"]');
+    if (!card) return;
+    card.setAttribute("data-color", color.name);
+    tintedSrc(photoOf(p), color.hex, function (url) { card.querySelector("img").src = url; });
+    card.querySelectorAll(".p-dots i").forEach(function (d) { d.classList.toggle("on", d.getAttribute("data-color") === color.name); });
+  }
+  $("grid").addEventListener("click", function (e) {
+    var d = e.target.closest(".p-dots i");
+    if (!d) return;
+    e.preventDefault();
+    var card = d.closest(".p-card");
+    paintTile(shop.products.filter(function (p) { return p.id === card.getAttribute("data-id"); })[0], colorByName(d.getAttribute("data-color")));
+  });
+  // clicking a card opens the product in the colour the shopper picked
+  $("grid").addEventListener("click", function (e) {
+    var card = e.target.closest(".p-card");
+    if (!card || e.target.closest(".p-dots i")) return;
+    card.setAttribute("href", "#/p/" + card.getAttribute("data-id") + (card.getAttribute("data-color") ? "?c=" + encodeURIComponent(card.getAttribute("data-color")) : ""));
+  }, true);
 
   /* ---------- product page ---------- */
-  function openProduct(p) {
-    cur = { product: p, color: shop.colors[0], size: "", qty: 1 };
+  function openProduct(p, colorName) {
+    cur = { product: p, color: colorByName(colorName || p.defaultColor), size: "", qty: 1 };
     $("crumbName").textContent = p.name;
     $("pName").textContent = p.name;
     $("pPrice").innerHTML = p.from ? "From $" + p.from + " <small>each</small>" : "Price on request";
@@ -451,6 +505,7 @@
       $("swatches").appendChild(b);
     });
     $("colorName").textContent = cur.color.name;
+    document.querySelectorAll("#swatches .sw").forEach(function (x) { x.classList.toggle("on", x.title === cur.color.name); });
 
     // size
     $("optSize").hidden = !p.sized;
@@ -645,8 +700,8 @@
     var h = location.hash.replace(/^#\/?/, "");
     document.querySelector(".main-nav").classList.remove("open");
     if (h.indexOf("p/") === 0) {
-      var p = shop.products.filter(function (x) { return x.id === h.slice(2); })[0];
-      if (p) { openProduct(p); return; }
+      var q = h.slice(2).split("?c="), p = shop.products.filter(function (x) { return x.id === q[0]; })[0];
+      if (p) { openProduct(p, q[1] ? decodeURIComponent(q[1]) : ""); return; }
     }
     if (h === "checkout" && cart.length) { document.title = "Checkout | Everything Embroidered"; show("checkout"); return; }
     if (h === "done" && $("doneId").textContent) { document.title = "Order placed | Everything Embroidered"; show("done"); return; }
