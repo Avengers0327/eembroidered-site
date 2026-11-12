@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shop | Everything Embroidered</title>
-<link rel="stylesheet" href="style.css?v=202611112243">
-<link rel="stylesheet" href="staff.css?v=202611112243">
+<link rel="stylesheet" href="style.css?v=202611112246">
+<link rel="stylesheet" href="staff.css?v=202611112246">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -384,9 +384,9 @@
   </div>
 </footer>
 
-<script src="gallery-config.js?v=202611112243"></script>
-<script src="staff.js?v=202611112243"></script>
-<script src="designer.js?v=202611112243"></script>
+<script src="gallery-config.js?v=202611112246"></script>
+<script src="staff.js?v=202611112246"></script>
+<script src="designer.js?v=202611112246"></script>
 <script>
 (function () {
   "use strict";
@@ -412,6 +412,11 @@
 
   /* ---------- shop grid ---------- */
   var tintCache = {}, photoCache = {};
+  function frontColors() {
+    var names = shop.frontColors || [];
+    var list = shop.colors.filter(function (c) { return !names.length || names.indexOf(c.name) >= 0; });
+    return list.length ? list : shop.colors;
+  }
   function colorByName(n) { return shop.colors.filter(function (c) { return c.name === n; })[0] || shop.colors[0]; }
 
   // Dye the white photo the chosen colour (multiply keeps every fold and shadow).
@@ -442,9 +447,9 @@
     $("grid").innerHTML = shop.products.map(function (p) {
       var def = colorByName(p.defaultColor);
       var dots = p.shape
-        ? '<div class="p-dots">' + shop.colors.slice(0, 6).map(function (c) {
+        ? '<div class="p-dots">' + frontColors().map(function (c) {
             return '<i data-color="' + esc(c.name) + '" style="background:' + c.hex + '"' + (c === def ? ' class="on"' : "") + ' title="' + esc(c.name) + '"></i>';
-          }).join("") + (shop.colors.length > 6 ? "<span>+" + (shop.colors.length - 6) + "</span>" : "") + "</div>"
+          }).join("") + "</div>"
         : "";
       return '<a class="p-card" data-id="' + p.id + '" href="#/p/' + p.id + '">' +
         '<div class="p-tile">' + (p.shape ? '<span class="p-badge">Design it live</span>' : "") +
