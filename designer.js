@@ -211,8 +211,14 @@
 
     panel.appendChild(boxPic); panel.appendChild(boxText);
     panel.appendChild(boxPlace); panel.appendChild(boxSize);
-    wrap.appendChild(stage); wrap.appendChild(panel);
-    root.appendChild(wrap);
+    if (opts.panelParent) {           // shop page: preview and controls live in separate columns
+      root.appendChild(stage);
+      opts.panelParent.innerHTML = "";
+      opts.panelParent.appendChild(panel);
+    } else {
+      wrap.appendChild(stage); wrap.appendChild(panel);
+      root.appendChild(wrap);
+    }
 
     /* ---------- drawing ---------- */
     function shape() { return SHAPES[shapeName]; }

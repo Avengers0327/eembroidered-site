@@ -32,20 +32,30 @@ export default {
     { name: "Tan",    hex: "#D8C3A0" }
   ],
 
-  // shape: which photo the designer shows (null = no picture, the customer
-  // just describes it). sized: asks for sizes. askQty: asks how many.
+  // shape: which photo the designer shows (null = no live preview, the
+  // customer just describes it). image: photo used when there is no shape.
+  // sized: asks for a size. blurb: the short description on the product page.
   products: [
-    { id: "tshirt",  name: "T-Shirt",            from: 25, shape: "tshirt", sized: true  },
-    { id: "polo",    name: "Polo Shirt",         from: 25, shape: "polo",   sized: true  },
-    { id: "hoodie",  name: "Hoodie / Sweatshirt", from: 25, shape: "hoodie", sized: true  },
-    { id: "hat",     name: "Hat / Cap",          from: 25, shape: "hat",    sized: false },
-    { id: "tote",    name: "Tote Bag",           from: 25, shape: "tote",   sized: false },
-    { id: "towel",   name: "Towel / Blanket",    from: 25, shape: "towel",  sized: false },
-    { id: "stocking", name: "Christmas Stocking", from: 20, shape: null, sized: false, askQty: true,
-      hint: "Tell us the names and colours you'd like." },
-    { id: "own",     name: "My Own Item",        from: 20, shape: null,     sized: false, askQty: true,
-      hint: "Bring it to the shop and we'll customize it." },
-    { id: "other",   name: "Something Else",     from: null, shape: null,   sized: false,
-      hint: "Tell us what you need and we'll make it happen." }
+    { id: "tshirt",  name: "Custom T-Shirt", from: 25, shape: "tshirt", sized: true,
+      blurb: "A classic tee with your logo, name or design. Add it below and see it on the shirt before you order." },
+    { id: "polo",    name: "Custom Polo Shirt", from: 25, shape: "polo", sized: true,
+      blurb: "A collared polo for work, teams and events, with your logo on the chest." },
+    { id: "hoodie",  name: "Custom Hoodie", from: 25, shape: "hoodie", sized: true,
+      blurb: "A pullover hoodie with your logo, name or design on the front." },
+    { id: "hat",     name: "Custom Hat", from: 25, shape: "hat", sized: false,
+      blurb: "A baseball cap with your logo or words on the front." },
+    { id: "tote",    name: "Custom Tote Bag", from: 25, shape: "tote", sized: false,
+      blurb: "A tote bag with your logo, monogram or design." },
+    { id: "towel",   name: "Custom Towel or Blanket", from: 25, shape: "towel", sized: false,
+      blurb: "A towel or blanket with a name, monogram or design." },
+    { id: "stocking", name: "Personalized Christmas Stocking", from: 20, shape: null, sized: false,
+      image: "/images_fallback/stockings1.jpg",
+      blurb: "A Christmas stocking with a name on it. Tell us the names and colours you'd like." },
+    { id: "own",     name: "Bring Your Own Item", from: 20, shape: null, sized: false,
+      image: "/images_fallback/monogram.jpg",
+      blurb: "Already have the item? Bring it to the shop and we'll customize it. Tell us what it is and what you'd like on it." },
+    { id: "other",   name: "Something Else", from: null, shape: null, sized: false,
+      image: "/images_fallback/spools.jpg",
+      blurb: "Don't see it here? We customize almost anything. Tell us what you need and we'll call you with a price." }
   ]
 };

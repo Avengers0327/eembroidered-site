@@ -3,180 +3,388 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Online | Everything Embroidered</title>
-<link rel="stylesheet" href="style.css?v=202611112208">
-<link rel="stylesheet" href="staff.css?v=202611112208">
+<title>Shop | Everything Embroidered</title>
+<link rel="stylesheet" href="style.css?v=202611112222">
+<link rel="stylesheet" href="staff.css?v=202611112222">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="robots" content="noindex, nofollow">
 <style>
-  .steps-bar { display: flex; justify-content: center; gap: 8px; margin: 0 0 24px; }
-  .steps-bar i { width: 46px; height: 8px; border-radius: 99px; background: #D9CFBD; }
-  .steps-bar i.on { background: var(--terracotta); }
-
-  .choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
-  .choice {
-    background: #fff; border: 3px solid #D9CFBD; border-radius: 18px; padding: 22px 14px;
-    font-family: 'Inter', sans-serif; cursor: pointer; text-align: center; min-height: 110px;
-    transition: border-color 0.15s ease, transform 0.15s ease;
+  /* ---------- header cart ---------- */
+  .cart-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1.5px solid var(--navy); border-radius: 999px;
+    padding: 8px 16px; font-weight: 600; font-size: 0.95rem; color: var(--navy);
+    background: none; cursor: pointer; font-family: 'Inter', sans-serif;
   }
-  .choice:hover { border-color: var(--terracotta); transform: translateY(-2px); }
-  .choice .t { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 600; color: var(--navy); display: block; }
-  .choice .p { display: inline-block; margin-top: 8px; font-size: 0.95rem; font-weight: 700; color: var(--terracotta-dark); background: rgba(193,97,61,0.1); padding: 3px 12px; border-radius: 999px; }
-  .choice .h { display: block; margin-top: 8px; font-size: 0.95rem; color: #57534A; }
-
-  h2.q { font-size: 1.5rem; margin: 26px 0 14px; }
-  .swatches { display: flex; flex-wrap: wrap; gap: 14px; }
-  .swatch { background: none; border: none; cursor: pointer; text-align: center; padding: 0; font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--navy); }
-  .swatch i { display: block; width: 62px; height: 62px; border-radius: 50%; border: 3px solid #D9CFBD; margin: 0 auto 4px; }
-  .swatch.on i { border-color: var(--terracotta); box-shadow: 0 0 0 4px rgba(193,97,61,0.35); }
-
-  .qty-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
-  .qty { background: #fff; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: var(--shadow); }
-  .qty .lab { font-weight: 700; font-size: 1.1rem; color: var(--navy); }
-  .qty .ctl { display: flex; align-items: center; gap: 8px; }
-  .qty button {
-    width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--navy); background: #fff;
-    font-size: 1.6rem; font-weight: 700; color: var(--navy); cursor: pointer; line-height: 1;
+  .cart-link:hover { background: var(--cream-2); }
+  .cart-count {
+    background: var(--terracotta); color: #fff; border-radius: 999px;
+    min-width: 22px; height: 22px; padding: 0 6px; font-size: 0.8rem; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
   }
-  .qty button:hover { background: var(--cream-2); }
-  .qty .num { min-width: 40px; text-align: center; font-size: 1.5rem; font-weight: 700; }
+  .cart-fab {
+    position: fixed; right: 16px; bottom: 16px; z-index: 60;
+    background: var(--navy); color: #fff; border: none; border-radius: 999px;
+    padding: 14px 20px; font-weight: 700; font-size: 1rem; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.28); font-family: 'Inter', sans-serif;
+    display: none; align-items: center; gap: 8px;
+  }
+  @media (max-width: 720px) { .cart-fab.has { display: inline-flex; } }
 
-  .nav { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; margin-top: 30px; }
-  @media (max-width: 560px) { .nav { grid-template-columns: 1fr; } .nav .bigbtn.plain { order: 2; } }
+  .staff-strip { background: #FFF8E8; border-bottom: 2px solid var(--thread-gold); color: #6B5B33; text-align: center; padding: 10px 16px; font-size: 0.95rem; }
 
-  .cart-item { display: flex; gap: 14px; align-items: center; padding: 14px 0; border-bottom: 2px dashed #E5DDCE; }
-  .cart-item img { width: 84px; height: 95px; object-fit: cover; border-radius: 10px; background: #F3EEE4; flex-shrink: 0; }
-  .cart-item .w { flex: 1; min-width: 0; }
-  .cart-item .w b { font-size: 1.2rem; color: var(--navy); display: block; }
-  .cart-item .w span { color: #57534A; font-size: 1rem; }
-  .cart-item button { background: none; border: none; color: #B03A2E; font-weight: 700; font-size: 1rem; cursor: pointer; text-decoration: underline; padding: 8px; }
-  .estimate { font-size: 1.15rem; margin: 18px 0 0; }
+  /* ---------- grid ---------- */
+  .shop-head { text-align: center; padding: 56px 0 26px; }
+  .shop-head h1 { margin-bottom: 10px; }
+  .shop-head p { color: #4A453C; max-width: 52ch; margin: 0 auto; font-size: 1.08rem; }
+  .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px 22px; padding-bottom: 80px; }
+  @media (max-width: 900px) { .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 26px 14px; } }
+  .p-card { display: block; cursor: pointer; }
+  .p-tile {
+    background: #ECE7DD; border-radius: 6px; aspect-ratio: 1 / 1.08; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; position: relative;
+    transition: background 0.2s ease;
+  }
+  .p-card:hover .p-tile { background: #E3DCCD; }
+  .p-tile img { width: 78%; height: 78%; object-fit: contain; transition: transform 0.3s ease; filter: drop-shadow(0 10px 14px rgba(28,43,58,0.18)); }
+  .p-tile img.cover { width: 100%; height: 100%; object-fit: cover; filter: none; }
+  .p-card:hover .p-tile img { transform: scale(1.04); }
+  .p-badge {
+    position: absolute; top: 12px; left: 12px; background: #fff; color: var(--terracotta-dark);
+    border: 1.5px solid var(--thread-gold); border-radius: 999px; padding: 3px 12px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; z-index: 1;
+  }
+  .p-name { font-weight: 500; color: var(--ink); margin: 12px 0 2px; font-size: 1rem; }
+  .p-price { font-weight: 600; color: var(--navy); font-size: 0.98rem; }
+  .p-dots { display: flex; gap: 6px; margin-top: 10px; align-items: center; }
+  .p-dots i { width: 15px; height: 15px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.25); display: block; }
+  .p-dots span { font-size: 0.8rem; color: #7A7365; }
 
-  .done-box { text-align: center; }
-  .done-box .tick { font-size: 4rem; line-height: 1; }
-  .done-box .num { font-family: 'Fraunces', serif; font-size: 3rem; font-weight: 600; color: var(--terracotta-dark); margin: 6px 0 14px; }
+  /* ---------- product page ---------- */
+  .crumbs { font-size: 0.88rem; color: #7A7365; padding: 22px 0 14px; }
+  .crumbs a { text-decoration: underline; }
+  .pdp { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 44px; align-items: start; padding-bottom: 80px; }
+  @media (max-width: 900px) { .pdp { grid-template-columns: 1fr; gap: 22px; } }
+  .pdp-media { position: sticky; top: 96px; }
+  @media (max-width: 900px) { .pdp-media { position: static; max-width: 520px; width: 100%; margin: 0 auto; } }
+  .pdp-media .eed-stage { box-shadow: none; background: #ECE7DD; border-radius: 6px; padding: 0; }
+  .pdp-media .eed-stage canvas { border-radius: 6px; }
+  .pdp-media .eed-tip { padding-bottom: 12px; font-size: 0.92rem; }
+  .pdp-photo { border-radius: 6px; overflow: hidden; background: #ECE7DD; }
+  .pdp-photo img { width: 100%; aspect-ratio: 1 / 1.05; object-fit: cover; }
+
+  .pdp-info h1 { font-size: clamp(1.8rem, 3.2vw, 2.4rem); margin-bottom: 6px; }
+  .pdp-price { font-size: 1.25rem; font-weight: 600; color: var(--navy); }
+  .pdp-price small { font-weight: 400; color: #7A7365; font-size: 0.9rem; }
+  .pdp-blurb { color: #4A453C; margin: 14px 0 0; }
+  .opt { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 20px; }
+  .opt-label { font-weight: 600; color: var(--navy); margin-bottom: 12px; font-size: 0.98rem; }
+  .opt-label span { font-weight: 400; color: #57534A; }
+  .sw-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .sw { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.25); cursor: pointer; padding: 0; position: relative; }
+  .sw.on { box-shadow: 0 0 0 3px var(--cream), 0 0 0 5px var(--navy); }
+  .size-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; }
+  .size-btn {
+    background: var(--cream-2); border: 1.5px solid transparent; border-radius: 4px;
+    padding: 12px 6px; font-family: 'Inter', sans-serif; font-size: 0.92rem; font-weight: 500; color: var(--ink); cursor: pointer;
+  }
+  .size-btn:hover { border-color: #B5AC9B; }
+  .size-btn.on { background: #fff; border-color: var(--navy); font-weight: 700; }
+  .opt-hint { font-size: 0.88rem; color: #7A7365; margin: 10px 0 0; }
+  .qty-ctl { display: inline-flex; align-items: center; border: 1.5px solid var(--line); border-radius: 6px; background: #fff; }
+  .qty-ctl button { width: 46px; height: 46px; border: none; background: none; font-size: 1.3rem; cursor: pointer; color: var(--navy); }
+  .qty-ctl button:hover { background: var(--cream-2); }
+  .qty-ctl span { min-width: 44px; text-align: center; font-weight: 700; font-size: 1.05rem; }
+
+  #pPanel .eed-panel { gap: 12px; }
+  #pPanel .eed-box { box-shadow: none; border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  #pPanel .eed-btn { font-size: 1rem; padding: 12px; min-height: 48px; border-radius: 8px; border-width: 1.5px; }
+  #pPanel .eed-btn.primary { font-size: 1.05rem; padding: 15px; }
+  #pPanel .eed-text input { font-size: 1rem; padding: 12px; border-radius: 8px; }
+  #pPanel .eed-ink { width: 36px; height: 36px; }
+
+  .notes { width: 100%; min-height: 84px; font-family: 'Inter', sans-serif; font-size: 0.98rem; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 8px; background: #fff; resize: vertical; }
+  .notes:focus, .co-field input:focus, .co-field textarea:focus { outline: 2px solid var(--terracotta); outline-offset: 1px; }
+  .add-btn {
+    display: block; width: 100%; margin-top: 22px;
+    background: var(--terracotta); color: #fff; border: none; border-radius: 4px;
+    padding: 18px; font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s ease;
+  }
+  .add-btn:hover { background: var(--terracotta-dark); }
+  .add-btn:disabled { background: #B5AC9B; cursor: default; }
+  .add-btn.navy { background: var(--navy); }
+  .add-btn.navy:hover { background: #2A3F54; }
+  .add-btn.ghost { background: #fff; color: var(--navy); border: 1.5px solid var(--navy); }
+  .add-btn.ghost:hover { background: var(--cream-2); }
+  .pay-line { text-align: center; font-size: 0.9rem; color: #57534A; margin: 12px 0 0; }
+  .p-err { color: #B03A2E; font-weight: 600; min-height: 1.3em; margin: 12px 0 0; }
+  details.acc { border-top: 1px solid var(--line); padding: 16px 0; }
+  details.acc:last-of-type { border-bottom: 1px solid var(--line); }
+  details.acc summary { cursor: pointer; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.9rem; color: var(--navy); list-style: none; display: flex; justify-content: space-between; }
+  details.acc summary::-webkit-details-marker { display: none; }
+  details.acc summary::after { content: "+"; font-size: 1.2rem; }
+  details.acc[open] summary::after { content: "−"; }
+  details.acc ul, details.acc p { color: #4A453C; font-size: 0.95rem; margin: 12px 0 0; padding-left: 18px; }
+  details.acc p { padding-left: 0; }
+
+  /* ---------- cart drawer ---------- */
+  .veil { position: fixed; inset: 0; background: rgba(15,25,35,0.5); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+  .veil.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100vw); background: var(--cream); z-index: 100;
+    transform: translateX(100%); transition: transform 0.28s ease; display: flex; flex-direction: column;
+    box-shadow: -10px 0 40px rgba(0,0,0,0.2);
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+  .drawer-head h2 { font-size: 1.4rem; margin: 0; }
+  .drawer-head button { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--navy); line-height: 1; padding: 6px 10px; }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 6px 22px; }
+  .drawer-foot { padding: 18px 22px 22px; border-top: 1px solid var(--line); background: #fff; }
+  .drawer-foot .add-btn { margin-top: 12px; }
+  .line { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .line img { width: 84px; height: 95px; object-fit: cover; border-radius: 6px; background: #ECE7DD; flex-shrink: 0; }
+  .line .w { flex: 1; min-width: 0; }
+  .line .n { font-weight: 600; color: var(--navy); }
+  .line .m { font-size: 0.88rem; color: #57534A; margin-top: 2px; overflow-wrap: anywhere; }
+  .line .row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 8px; }
+  .line .qty-ctl button { width: 34px; height: 34px; font-size: 1.1rem; }
+  .line .qty-ctl span { min-width: 32px; font-size: 0.95rem; }
+  .line .rm { background: none; border: none; color: #7A7365; text-decoration: underline; font-size: 0.85rem; cursor: pointer; }
+  .sum-row { display: flex; justify-content: space-between; font-weight: 600; color: var(--navy); font-size: 1.05rem; }
+  .sum-note { font-size: 0.86rem; color: #57534A; margin: 6px 0 0; }
+  .empty-cart { text-align: center; padding: 60px 10px; color: #57534A; }
+
+  /* ---------- checkout ---------- */
+  .co { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 44px; align-items: start; padding: 10px 0 80px; }
+  @media (max-width: 900px) { .co { grid-template-columns: 1fr; gap: 26px; } .co-sum { order: -1; } }
+  .co h1 { font-size: clamp(1.8rem, 3.2vw, 2.4rem); }
+  .co-field { margin-bottom: 16px; }
+  .co-field label { display: block; font-weight: 600; font-size: 0.92rem; color: var(--navy); margin-bottom: 6px; }
+  .co-field label span { font-weight: 400; color: #7A7365; }
+  .co-field input, .co-field textarea { width: 100%; font-family: 'Inter', sans-serif; font-size: 1rem; padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
+  .co-field textarea { min-height: 90px; resize: vertical; }
+  .co-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .co-two { grid-template-columns: 1fr; gap: 0; } }
+  .co-sum { background: #fff; border-radius: 10px; padding: 22px; box-shadow: var(--shadow); }
+  .co-sum h2 { font-size: 1.3rem; }
+  .co-sum .line:last-of-type { border-bottom: none; }
+  .co-total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 16px; }
+
+  .done { text-align: center; max-width: 560px; margin: 0 auto; padding: 70px 0 90px; }
+  .done .num { font-family: 'Fraunces', serif; font-size: 2.6rem; font-weight: 600; color: var(--terracotta-dark); margin: 4px 0 14px; }
   .hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
+  [hidden] { display: none !important; }
 </style>
 </head>
-<body class="big">
+<body>
 
-<div class="top-bar">
-  <div class="name">Everything <span>Embroidered</span></div>
-  <div class="links">
-    <a href="/" id="homeLink">← Back to the website</a>
-    <a href="tel:2019163221">📞 (201) 916-3221</a>
+<div class="call-strip">Call or text us at <a href="tel:2019163221"><strong><u>(201) 916-3221</u></strong></a><span class="strip-addr"> &nbsp;·&nbsp; 700 Paramus Park, Paramus, NJ</span></div>
+
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a href="/" class="brand">Everything <span>Embroidered</span></a>
+    <button class="menu-toggle" aria-label="Toggle menu" onclick="document.querySelector('.main-nav').classList.toggle('open')">☰</button>
+    <nav class="main-nav">
+      <a href="/" class="stitch-underline">Home</a>
+      <a href="/work" class="stitch-underline">Our Work</a>
+      <a href="/bulk" class="stitch-underline">Bulk &amp; Corporate</a>
+      <a href="/faq" class="stitch-underline">FAQs</a>
+      <a href="/order" class="stitch-underline active">Shop</a>
+      <button type="button" class="cart-link" data-cart>Cart <span class="cart-count" data-count>0</span></button>
+    </nav>
   </div>
-</div>
+</header>
 
-<div class="page">
+<div class="staff-strip" id="staffNote" hidden></div>
 
-  <div class="notice" id="staffNote" hidden></div>
+<main class="container">
 
-  <!-- not open yet -->
-  <section id="s-closed" hidden>
-    <div class="card" style="text-align:center; max-width:560px; margin:40px auto;">
-      <div style="font-size:3rem;">🧵</div>
-      <h1 style="font-size:2rem;">Online ordering is coming soon</h1>
-      <p class="intro" style="margin-bottom:22px;">Until then, call or text us and we'll take care of you.</p>
-      <a class="bigbtn" href="tel:2019163221">📞 Call (201) 916-3221</a>
-      <p style="margin:18px 0 0;"><a href="/contact" style="text-decoration:underline;">Or send us a quote request</a></p>
+  <section id="v-loading"><p style="text-align:center; padding:90px 0; color:#57534A;">Loading the shop…</p></section>
+
+  <section id="v-closed" hidden>
+    <div class="done">
+      <h1>Online ordering is coming soon</h1>
+      <p>Until then, call or text us and we'll take care of you.</p>
+      <a class="btn" style="background:var(--terracotta); color:#fff;" href="tel:2019163221">Call (201) 916-3221</a>
     </div>
   </section>
 
-  <section id="s-loading"><p class="intro" style="margin-top:60px;">Loading…</p></section>
-
-  <!-- 1. what -->
-  <section id="s-pick" hidden>
-    <div class="steps-bar"><i class="on"></i><i></i><i></i><i></i></div>
-    <h1>What would you like?</h1>
-    <p class="intro">Tap the item you want us to customize.</p>
-    <div class="choices" id="products"></div>
-    <div class="nav" id="pickBack" hidden style="grid-template-columns:1fr;">
-      <button class="bigbtn plain" data-go="cart">← Back to my order</button>
+  <!-- shop grid -->
+  <section id="v-grid" hidden>
+    <div class="shop-head">
+      <div class="hero-eyebrow" style="color:var(--terracotta-dark);">Order online</div>
+      <h1>Shop custom embroidery</h1>
+      <p>Pick an item, add your logo or words, and see it before you order. Pick up and pay in store at Paramus Park Mall.</p>
     </div>
+    <div class="shop-grid" id="grid"></div>
   </section>
 
-  <!-- 2. colour + how many -->
-  <section id="s-options" hidden>
-    <div class="steps-bar"><i class="on"></i><i class="on"></i><i></i><i></i></div>
-    <h1 id="optTitle"></h1>
-    <div id="colorBlock">
-      <h2 class="q">Which colour?</h2>
-      <div class="swatches" id="colors"></div>
-    </div>
-    <h2 class="q" id="qtyQ">How many?</h2>
-    <div class="qty-grid" id="qtys"></div>
-    <div class="msg-err" id="optMsg"></div>
-    <div class="nav">
-      <button class="bigbtn plain" data-go="pick">← Back</button>
-      <button class="bigbtn" id="optNext">Next →</button>
-    </div>
-  </section>
-
-  <!-- 3. design -->
-  <section id="s-design" hidden>
-    <div class="steps-bar"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
-    <h1>What should we put on it?</h1>
-    <p class="intro" id="designIntro">Add your logo, a picture, or some words. Not sure? Skip this and just tell us below.</p>
-    <div id="designer"></div>
-    <div class="field" style="margin-top:22px;">
-      <label for="details">Anything else we should know? <span class="hint" id="detailsHint">(optional)</span></label>
-      <textarea id="details" placeholder="Thread colours, exact wording, anything special…"></textarea>
-    </div>
-    <div class="msg-err" id="designMsg"></div>
-    <div class="nav">
-      <button class="bigbtn plain" id="designBack">← Back</button>
-      <button class="bigbtn" id="designNext">Add this to my order →</button>
-    </div>
-  </section>
-
-  <!-- 4. cart + details -->
-  <section id="s-cart" hidden>
-    <div class="steps-bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
-    <div class="page narrow" style="padding:0;">
-      <h1>Your order</h1>
-      <div class="card">
-        <div id="cart"></div>
-        <p class="estimate" id="estimate"></p>
-        <button class="bigbtn plain small" data-go="pick" style="margin-top:16px;">＋ Add another item</button>
+  <!-- product page -->
+  <section id="v-product" hidden>
+    <div class="crumbs"><a href="/">Home</a> / <a href="#/">Shop</a> / <span id="crumbName"></span></div>
+    <div class="pdp">
+      <div class="pdp-media">
+        <div id="pDesigner"></div>
+        <div class="pdp-photo" id="pPhoto" hidden><img alt="" id="pPhotoImg"></div>
       </div>
+      <div class="pdp-info">
+        <h1 id="pName"></h1>
+        <div class="pdp-price" id="pPrice"></div>
+        <p class="pdp-blurb" id="pBlurb"></p>
 
-      <h2 class="q">How do we reach you?</h2>
-      <div class="card">
-        <div class="field"><label for="cName">Your name</label><input type="text" id="cName" autocomplete="name"></div>
-        <div class="field"><label for="cPhone">Phone number <span class="hint">(we'll call or text to confirm your price)</span></label><input type="tel" id="cPhone" autocomplete="tel" placeholder="(201) 000-0000"></div>
-        <div class="field"><label for="cEmail">Email <span class="hint">(optional)</span></label><input type="email" id="cEmail" autocomplete="email"></div>
-        <div class="field"><label for="cDate">When do you need it by? <span class="hint">(optional)</span></label><input type="date" id="cDate"></div>
-        <div class="field" style="margin-bottom:0;"><label for="cNotes">Notes for us <span class="hint">(optional)</span></label><textarea id="cNotes"></textarea></div>
+        <div class="opt" id="optColor">
+          <div class="opt-label">Color: <span id="colorName"></span></div>
+          <div class="sw-row" id="swatches"></div>
+        </div>
+
+        <div class="opt" id="optSize">
+          <div class="opt-label">Size: <span id="sizeName">choose one</span></div>
+          <div class="size-row" id="sizes"></div>
+          <p class="opt-hint">Need more than one size? Add each size to your cart.</p>
+        </div>
+
+        <div class="opt" id="optDesign">
+          <div class="opt-label">Personalize it</div>
+          <div id="pPanel"></div>
+        </div>
+
+        <div class="opt">
+          <div class="opt-label" id="notesLabel">Notes for us <span>(optional)</span></div>
+          <textarea class="notes" id="pNotes" placeholder="Thread colours, exact wording, anything special…"></textarea>
+        </div>
+
+        <div class="opt">
+          <div class="opt-label">Quantity</div>
+          <div class="qty-ctl"><button type="button" id="qMinus" aria-label="One less">−</button><span id="qNum">1</span><button type="button" id="qPlus" aria-label="One more">+</button></div>
+        </div>
+
+        <div class="p-err" id="pErr"></div>
+        <button class="add-btn" id="addBtn">Add to cart</button>
+        <p class="pay-line">No payment online. We confirm your price, then you pay at pickup.</p>
+
+        <div style="margin-top:26px;">
+          <details class="acc" open>
+            <summary>How it works</summary>
+            <ul>
+              <li>Add your logo or words here, or just describe what you want.</li>
+              <li>We call or text you to confirm the design and your exact price.</li>
+              <li>We make it, then let you know when it's ready.</li>
+            </ul>
+          </details>
+          <details class="acc">
+            <summary>Pickup &amp; payment</summary>
+            <p>Pick up at Everything Embroidered, 700 Paramus Park, Paramus, NJ 07662. Pay in store when you collect your order. Prices shown are starting prices; the final price depends on your design.</p>
+          </details>
+          <details class="acc">
+            <summary>Questions?</summary>
+            <p>Call or text <a href="tel:2019163221" style="text-decoration:underline;">(201) 916-3221</a>. For team, school or business orders, see <a href="/bulk" style="text-decoration:underline;">Bulk &amp; Corporate</a>.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- checkout -->
+  <section id="v-checkout" hidden>
+    <div class="crumbs"><a href="#/">Shop</a> / Checkout</div>
+    <div class="co">
+      <div>
+        <h1>Checkout</h1>
+        <p style="color:#4A453C; margin-bottom:22px;" id="payNote"></p>
+        <div class="co-field"><label for="cName">Full name</label><input type="text" id="cName" autocomplete="name"></div>
+        <div class="co-two">
+          <div class="co-field"><label for="cPhone">Phone number</label><input type="tel" id="cPhone" autocomplete="tel" placeholder="(201) 000-0000"></div>
+          <div class="co-field"><label for="cEmail">Email <span>(optional)</span></label><input type="email" id="cEmail" autocomplete="email"></div>
+        </div>
+        <div class="co-field"><label for="cDate">Need it by <span>(optional)</span></label><input type="date" id="cDate"></div>
+        <div class="co-field"><label for="cNotes">Order notes <span>(optional)</span></label><textarea id="cNotes"></textarea></div>
         <input type="text" class="hp" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="p-err" id="coErr"></div>
+        <button class="add-btn" id="place">Place order</button>
+        <p class="pay-line">You won't be charged anything now.</p>
       </div>
-
-      <div class="notice" style="margin-top:22px;" id="payNote"></div>
-      <div class="msg-err" id="cartMsg"></div>
-      <button class="bigbtn green" id="place">✔ Place my order</button>
+      <div class="co-sum">
+        <h2>Your order</h2>
+        <div id="coLines"></div>
+        <div class="co-total">
+          <div class="sum-row"><span>Estimated from</span><span id="coTotal"></span></div>
+          <p class="sum-note">We'll confirm your exact price before we start.</p>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- done -->
-  <section id="s-done" hidden>
-    <div class="card done-box" style="max-width:600px; margin:30px auto;">
-      <div class="tick">✅</div>
-      <h1 style="font-size:2.2rem; margin-top:10px;">Thank you! We got your order.</h1>
-      <p style="font-size:1.15rem; margin:0;">Your order number is</p>
+  <section id="v-done" hidden>
+    <div class="done">
+      <div style="font-size:3rem;">✅</div>
+      <h1>Thank you! We got your order.</h1>
+      <p style="margin:0;">Your order number is</p>
       <div class="num" id="doneId"></div>
-      <p style="font-size:1.15rem;" id="donePay"></p>
+      <p id="donePay"></p>
       <p style="color:#57534A;">Questions? Call or text <a href="tel:2019163221" style="text-decoration:underline;"><b>(201) 916-3221</b></a>.</p>
-      <a class="bigbtn" id="doneBtn" href="/">Back to the website</a>
+      <a class="btn" id="doneBtn" style="background:var(--terracotta); color:#fff; margin-top:10px;" href="/">Back to the website</a>
     </div>
   </section>
 
-</div>
+</main>
 
-<script src="gallery-config.js?v=202611112208"></script>
-<script src="staff.js?v=202611112208"></script>
-<script src="designer.js?v=202611112208"></script>
+<!-- cart drawer -->
+<div class="veil" id="veil"></div>
+<aside class="drawer" id="drawer" aria-label="Cart">
+  <div class="drawer-head"><h2>Your cart</h2><button type="button" id="drawerClose" aria-label="Close cart">×</button></div>
+  <div class="drawer-body" id="drawerLines"></div>
+  <div class="drawer-foot" id="drawerFoot">
+    <div class="sum-row"><span>Estimated from</span><span id="drawerTotal"></span></div>
+    <p class="sum-note">Final price confirmed before we start. Pay at pickup.</p>
+    <button class="add-btn navy" id="toCheckout">Checkout</button>
+    <button class="add-btn ghost" id="keepShopping" style="margin-top:10px;">Keep shopping</button>
+  </div>
+</aside>
+<button type="button" class="cart-fab" id="cartFab" data-cart>Cart <span class="cart-count" data-count>0</span></button>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4>Everything Embroidered</h4>
+        <p>700 Paramus Park, Paramus, NJ 07662<br>everythingembroidered@hotmail.com<br><a href="tel:2019163221"><strong><u>(201) 916-3221</u></strong></a></p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <div class="footer-links">
+          <a href="/about">About</a>
+          <a href="/work">Our Work</a>
+          <a href="/testimonials">Testimonials</a>
+          <a href="/bulk">Bulk &amp; Corporate</a>
+          <a href="/faq">FAQs</a>
+        </div>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <div class="footer-links">
+          <a href="/contact">Request a Quote</a>
+          <a href="https://www.facebook.com/everythingembroidered11">Facebook</a>
+        </div>
+      </div>
+      <div>
+        <h4>Admin</h4>
+        <div class="footer-links">
+          <a href="/staff">Staff Home</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">© Everything Embroidered. All designs and photos are of original client work.</div>
+  </div>
+</footer>
+
+<script src="gallery-config.js?v=202611112222"></script>
+<script src="staff.js?v=202611112222"></script>
+<script src="designer.js?v=202611112222"></script>
 <script>
 (function () {
   "use strict";
@@ -185,171 +393,190 @@
   var cfg = window.GALLERY_CONFIG || {};
   var shop = null;
   var staffMode = false;
-  var items = [];      // finished items in the order
-  var cur = null;      // the item being built
+  var cart = [];        // finished lines
+  var cur = null;       // { product, color, size, qty } on the product page
   var designer = null;
+  var VIEWS = ["loading", "closed", "grid", "product", "checkout", "done"];
 
   function show(name) {
-    ["closed", "loading", "pick", "options", "design", "cart", "done"].forEach(function (s) { $("s-" + s).hidden = s !== name; });
+    VIEWS.forEach(function (v) { $("v-" + v).hidden = v !== name; });
     window.scrollTo({ top: 0 });
   }
   function esc(s) {
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
+  function price(p) { return p.from ? "From $" + p.from : "Price on request"; }
+  function photoOf(p) { return p.shape ? "/mockups/" + p.shape + ".webp" : (p.image || "/images_fallback/spools.jpg"); }
 
-  /* ---------- 1. pick ---------- */
-  function paintProducts() {
-    $("products").innerHTML = "";
-    shop.products.forEach(function (p) {
-      var b = document.createElement("button");
-      b.type = "button"; b.className = "choice";
-      b.innerHTML = '<span class="t">' + esc(p.name) + "</span>" +
-        (p.from ? '<span class="p">From $' + p.from + "</span>" : "") +
-        (p.hint ? '<span class="h">' + esc(p.hint) + "</span>" : "");
-      b.addEventListener("click", function () { startItem(p); });
-      $("products").appendChild(b);
-    });
+  /* ---------- shop grid ---------- */
+  function paintGrid() {
+    $("grid").innerHTML = shop.products.map(function (p) {
+      var dots = p.shape
+        ? '<div class="p-dots">' + shop.colors.slice(0, 5).map(function (c) { return '<i style="background:' + c.hex + '"></i>'; }).join("") +
+          (shop.colors.length > 5 ? "<span>+" + (shop.colors.length - 5) + "</span>" : "") + "</div>"
+        : "";
+      return '<a class="p-card" href="#/p/' + p.id + '">' +
+        '<div class="p-tile">' + (p.shape ? '<span class="p-badge">Design it live</span>' : "") +
+        '<img loading="lazy" src="' + photoOf(p) + '" alt="' + esc(p.name) + '"' + (p.shape ? "" : ' class="cover"') + "></div>" +
+        '<div class="p-name">' + esc(p.name) + "</div>" +
+        '<div class="p-price">' + price(p) + "</div>" + dots + "</a>";
+    }).join("");
   }
 
-  function startItem(p) {
-    cur = { product: p, color: p.shape ? shop.colors[0] : null, sizes: {}, qty: 1 };
-    if (p.shape || p.askQty) paintOptions(); else openDesign();
-  }
+  /* ---------- product page ---------- */
+  function openProduct(p) {
+    cur = { product: p, color: shop.colors[0], size: "", qty: 1 };
+    $("crumbName").textContent = p.name;
+    $("pName").textContent = p.name;
+    $("pPrice").innerHTML = p.from ? "From $" + p.from + " <small>each</small>" : "Price on request";
+    $("pBlurb").textContent = p.blurb || "";
+    $("pNotes").value = "";
+    $("pErr").textContent = "";
+    $("qNum").textContent = "1";
+    document.title = p.name + " | Everything Embroidered";
 
-  /* ---------- 2. options ---------- */
-  function stepper(label, get, set) {
-    var row = document.createElement("div");
-    row.className = "qty";
-    row.innerHTML = '<span class="lab"></span><span class="ctl">' +
-      '<button type="button" aria-label="One less">−</button><span class="num"></span>' +
-      '<button type="button" aria-label="One more">+</button></span>';
-    row.querySelector(".lab").textContent = label;
-    var num = row.querySelector(".num"), btns = row.querySelectorAll("button");
-    function paint() { num.textContent = get(); }
-    btns[0].addEventListener("click", function () { set(Math.max(0, get() - 1)); paint(); });
-    btns[1].addEventListener("click", function () { set(Math.min(999, get() + 1)); paint(); });
-    paint();
-    return row;
-  }
-
-  function paintOptions() {
-    var p = cur.product;
-    $("optTitle").textContent = p.name;
-    $("optMsg").textContent = "";
-    $("colors").innerHTML = "";
+    // colour
+    $("optColor").hidden = !p.shape;
+    $("swatches").innerHTML = "";
     shop.colors.forEach(function (c) {
       var b = document.createElement("button");
-      b.type = "button"; b.className = "swatch" + (cur.color === c ? " on" : "");
-      b.innerHTML = "<i></i>";
-      b.firstChild.style.background = c.hex;
-      b.appendChild(document.createTextNode(c.name));
+      b.type = "button"; b.className = "sw" + (c === cur.color ? " on" : "");
+      b.style.background = c.hex; b.title = c.name; b.setAttribute("aria-label", c.name);
       b.addEventListener("click", function () {
         cur.color = c;
-        document.querySelectorAll("#colors .swatch").forEach(function (x) { x.classList.toggle("on", x === b); });
+        $("colorName").textContent = c.name;
+        document.querySelectorAll("#swatches .sw").forEach(function (x) { x.classList.toggle("on", x === b); });
+        if (designer) designer.setColor(c.hex);
       });
-      $("colors").appendChild(b);
+      $("swatches").appendChild(b);
     });
-    $("colorBlock").hidden = !p.shape || p.id === "own";
-    $("qtys").innerHTML = "";
-    if (p.sized) {
-      $("qtyQ").textContent = "How many of each size?";
-      shop.sizes.forEach(function (s) {
-        $("qtys").appendChild(stepper(s, function () { return cur.sizes[s] || 0; }, function (v) { cur.sizes[s] = v; }));
+    $("colorName").textContent = cur.color.name;
+
+    // size
+    $("optSize").hidden = !p.sized;
+    $("sizeName").textContent = "choose one";
+    $("sizes").innerHTML = "";
+    shop.sizes.forEach(function (s) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "size-btn"; b.textContent = s;
+      b.addEventListener("click", function () {
+        cur.size = s;
+        $("sizeName").textContent = s;
+        document.querySelectorAll("#sizes .size-btn").forEach(function (x) { x.classList.toggle("on", x === b); });
+        $("pErr").textContent = "";
       });
-    } else {
-      $("qtyQ").textContent = "How many?";
-      $("qtys").appendChild(stepper("Quantity", function () { return cur.qty; }, function (v) { cur.qty = Math.max(1, v); }));
-    }
-    show("options");
-  }
+      $("sizes").appendChild(b);
+    });
 
-  $("optNext").addEventListener("click", function () {
-    if (cur.product.sized) {
-      var total = Object.keys(cur.sizes).reduce(function (n, s) { return n + cur.sizes[s]; }, 0);
-      if (!total) { $("optMsg").textContent = "Tap the + button next to a size to choose how many you need."; return; }
-      cur.qty = total;
-    }
-    openDesign();
-  });
-
-  /* ---------- 3. design ---------- */
-  function openDesign() {
-    var p = cur.product;
-    $("designMsg").textContent = "";
-    $("details").value = "";
-    $("designer").hidden = !p.shape;
+    // live preview or photo
+    $("pDesigner").hidden = !p.shape;
+    $("optDesign").hidden = !p.shape;
+    $("pPhoto").hidden = !!p.shape;
     if (p.shape) {
-      if (!designer) designer = EEDesigner.create($("designer"), { shape: p.shape, color: cur.color.hex });
+      if (!designer) designer = EEDesigner.create($("pDesigner"), { shape: p.shape, color: cur.color.hex, panelParent: $("pPanel") });
       designer.clear();
       designer.setShape(p.shape);
       designer.setColor(cur.color.hex);
-      $("designIntro").textContent = "Add your logo, a picture, or some words. Not sure? Skip this and just tell us below.";
-      $("detailsHint").textContent = "(optional)";
+      $("notesLabel").innerHTML = "Notes for us <span>(optional)</span>";
     } else {
-      $("designIntro").textContent = "Tell us what you have in mind and we'll call you about it.";
-      $("detailsHint").textContent = "";
+      $("pPhotoImg").src = photoOf(p);
+      $("pPhotoImg").alt = p.name;
+      $("notesLabel").innerHTML = "Tell us what you'd like";
     }
-    show("design");
+    $("addBtn").disabled = false; $("addBtn").textContent = "Add to cart";
+    show("product");
   }
 
-  $("designBack").addEventListener("click", function () {
-    if (cur.product.shape || cur.product.askQty) show("options"); else show("pick");
-  });
+  $("qMinus").addEventListener("click", function () { cur.qty = Math.max(1, cur.qty - 1); $("qNum").textContent = cur.qty; });
+  $("qPlus").addEventListener("click", function () { cur.qty = Math.min(999, cur.qty + 1); $("qNum").textContent = cur.qty; });
 
-  $("designNext").addEventListener("click", function () {
-    var p = cur.product, details = $("details").value.trim();
-    var has = p.shape && designer.hasContent();
-    if (!has && !details) {
-      $("designMsg").textContent = p.shape
-        ? "Add a logo or words above, or type what you'd like in the box."
-        : "Please tell us a little about what you need.";
+  $("addBtn").addEventListener("click", function () {
+    var p = cur.product, notes = $("pNotes").value.trim(), err = $("pErr");
+    var has = !!p.shape && designer.hasContent();
+    err.textContent = "";
+    if (p.sized && !cur.size) { err.textContent = "Please choose a size."; $("optSize").scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+    if (!has && !notes) {
+      err.textContent = p.shape ? "Add a logo or words, or tell us what you'd like in the notes." : "Please tell us what you'd like.";
       return;
     }
-    var item = {
+    var sizes = {};
+    if (p.sized) sizes[cur.size] = cur.qty;
+    var line = {
       productId: p.id, name: p.name, from: p.from,
-      color: cur.color && p.id !== "own" ? cur.color.name : "",
-      qty: cur.qty, sizes: p.sized ? cur.sizes : {},
-      placement: has ? designer.getPlacement() : "",
-      text: has ? designer.getText() : "",
-      details: details, blob: null, files: has ? designer.getFiles() : []
+      color: p.shape ? cur.color.name : "", size: p.sized ? cur.size : "",
+      qty: cur.qty, sizes: sizes,
+      placement: has ? designer.getPlacement() : "", text: has ? designer.getText() : "",
+      details: notes, blob: null, files: has ? designer.getFiles() : [], preview: has ? "" : photoOf(p)
     };
-    var finish = function () { items.push(item); cur = null; paintCart(); show("cart"); };
+    var done = function () {
+      cart.push(line);
+      paintCart();
+      $("addBtn").disabled = false; $("addBtn").textContent = "Add to cart";
+      openDrawer();
+    };
     if (has) {
-      var nb = $("designNext");
-      nb.disabled = true; nb.textContent = "Saving your design…";
-      designer.exportBlob().then(function (b) {
-        item.blob = b; item.preview = URL.createObjectURL(b);
-        nb.disabled = false; nb.textContent = "Add this to my order →";
-        finish();
-      });
-    } else finish();
+      $("addBtn").disabled = true; $("addBtn").textContent = "Adding…";
+      designer.exportBlob().then(function (b) { line.blob = b; line.preview = URL.createObjectURL(b); done(); });
+    } else done();
   });
 
-  /* ---------- 4. cart ---------- */
-  function paintCart() {
-    $("cart").innerHTML = "";
-    var est = 0, unknown = false;
-    items.forEach(function (it, i) {
-      var sizes = Object.keys(it.sizes).filter(function (s) { return it.sizes[s]; }).map(function (s) { return it.sizes[s] + " " + s; }).join(", ");
-      var row = document.createElement("div");
-      row.className = "cart-item";
-      row.innerHTML = (it.preview ? '<img src="' + it.preview + '" alt="">' : "") +
-        '<div class="w"><b>' + it.qty + " × " + esc(it.name) + (it.color ? " — " + esc(it.color) : "") + "</b>" +
-        "<span>" + esc([sizes, it.text ? "“" + it.text + "”" : "", it.details].filter(Boolean).join(" · ")) + "</span></div>" +
-        '<button type="button">Remove</button>';
-      row.querySelector("button").addEventListener("click", function () {
-        items.splice(i, 1);
-        if (items.length) paintCart(); else { $("pickBack").hidden = true; show("pick"); }
-      });
-      $("cart").appendChild(row);
-      if (it.from) est += it.from * it.qty; else unknown = true;
-    });
-    $("estimate").innerHTML = est
-      ? "Starting from about <b>$" + est + "</b>" + (unknown ? " plus your custom item" : "") + ". We'll confirm your exact price before we start."
-      : "We'll call you with a price before we start.";
-    $("pickBack").hidden = !items.length;
+  /* ---------- cart ---------- */
+  function total() {
+    var t = 0, unknown = false;
+    cart.forEach(function (l) { if (l.from) t += l.from * l.qty; else unknown = true; });
+    return (t ? "$" + t : "") + (unknown ? (t ? " + quote" : "We'll quote you") : "");
+  }
+  function count() { return cart.reduce(function (n, l) { return n + l.qty; }, 0); }
+
+  function lineHtml(l, i, editable) {
+    var meta = [l.color, l.size, l.placement, l.text ? "“" + l.text + "”" : "", l.details].filter(Boolean).join(" · ");
+    return '<div class="line"><img src="' + l.preview + '" alt=""><div class="w">' +
+      '<div class="n">' + esc(l.name) + "</div>" +
+      '<div class="m">' + esc(meta) + "</div>" +
+      '<div class="row">' + (editable
+        ? '<span class="qty-ctl"><button type="button" data-q="-1" data-i="' + i + '" aria-label="One less">−</button><span>' + l.qty +
+          '</span><button type="button" data-q="1" data-i="' + i + '" aria-label="One more">+</button></span>' +
+          '<button type="button" class="rm" data-rm="' + i + '">Remove</button>'
+        : "<span>Qty " + l.qty + "</span>") +
+      '<span style="font-weight:600; color:var(--navy);">' + (l.from ? "from $" + (l.from * l.qty) : "quote") + "</span></div></div></div>";
   }
 
+  function paintCart() {
+    var n = count();
+    document.querySelectorAll("[data-count]").forEach(function (e) { e.textContent = n; });
+    $("cartFab").classList.toggle("has", n > 0);
+    $("drawerLines").innerHTML = cart.length
+      ? cart.map(function (l, i) { return lineHtml(l, i, true); }).join("")
+      : '<div class="empty-cart"><p>Your cart is empty.</p></div>';
+    $("drawerFoot").hidden = !cart.length;
+    $("drawerTotal").textContent = total();
+    $("coLines").innerHTML = cart.map(function (l, i) { return lineHtml(l, i, false); }).join("");
+    $("coTotal").textContent = total();
+  }
+
+  function openDrawer() { $("drawer").classList.add("open"); $("veil").classList.add("open"); }
+  function closeDrawer() { $("drawer").classList.remove("open"); $("veil").classList.remove("open"); }
+  document.querySelectorAll("[data-cart]").forEach(function (b) { b.addEventListener("click", openDrawer); });
+  $("drawerClose").addEventListener("click", closeDrawer);
+  $("veil").addEventListener("click", closeDrawer);
+  $("keepShopping").addEventListener("click", function () { closeDrawer(); location.hash = "#/"; });
+  $("toCheckout").addEventListener("click", function () { closeDrawer(); location.hash = "#/checkout"; });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+
+  $("drawerLines").addEventListener("click", function (e) {
+    var q = e.target.closest("[data-q]"), rm = e.target.closest("[data-rm]");
+    if (q) {
+      var l = cart[+q.getAttribute("data-i")];
+      l.qty = Math.max(1, Math.min(999, l.qty + (+q.getAttribute("data-q"))));
+      if (l.size) { l.sizes = {}; l.sizes[l.size] = l.qty; }
+    } else if (rm) {
+      cart.splice(+rm.getAttribute("data-rm"), 1);
+    } else return;
+    paintCart();
+    if (!cart.length && !$("v-checkout").hidden) location.hash = "#/";
+  });
+
+  /* ---------- checkout ---------- */
   function upload(fileOrBlob) {
     if (!cfg.cloudName || !cfg.uploadPreset) return Promise.resolve("");
     var form = new FormData();
@@ -363,64 +590,77 @@
   }
 
   $("place").addEventListener("click", function () {
-    var btn = $("place"), msg = $("cartMsg");
+    var btn = $("place"), msg = $("coErr");
     msg.textContent = "";
     var name = $("cName").value.trim(), phone = $("cPhone").value.trim();
-    if (!items.length) { msg.textContent = "Your order is empty. Add an item first."; return; }
-    if (!name) { msg.textContent = "Please type your name."; $("cName").focus(); return; }
-    if (phone.replace(/\D/g, "").length < 10) { msg.textContent = "Please type your phone number with the area code."; $("cPhone").focus(); return; }
+    if (!cart.length) { msg.textContent = "Your cart is empty."; return; }
+    if (!name) { msg.textContent = "Please enter your name."; $("cName").focus(); return; }
+    if (phone.replace(/\D/g, "").length < 10) { msg.textContent = "Please enter your phone number with the area code."; $("cPhone").focus(); return; }
 
-    btn.disabled = true; btn.textContent = "Sending your order… please wait";
+    btn.disabled = true; btn.textContent = "Sending your order…";
 
-    Promise.all(items.map(function (it) {
+    Promise.all(cart.map(function (l) {
       return Promise.all([
-        it.blob ? upload(it.blob) : Promise.resolve(""),
-        Promise.all(it.files.slice(0, 4).map(upload))
+        l.blob ? upload(l.blob) : Promise.resolve(""),
+        Promise.all(l.files.slice(0, 4).map(upload))
       ]).then(function (res) {
-        var lost = (it.blob && !res[0]) || res[1].some(function (u) { return !u; });
+        var lost = (l.blob && !res[0]) || res[1].some(function (u) { return !u; });
         return {
-          productId: it.productId, color: it.color, qty: it.qty, sizes: it.sizes,
-          placement: it.placement, text: it.text,
-          details: it.details + (lost ? " [A picture didn't upload — please ask the customer to send it.]" : ""),
+          productId: l.productId, color: l.color, qty: l.qty, sizes: l.sizes,
+          placement: l.placement, text: l.text,
+          details: l.details + (lost ? " [A picture didn't upload — please ask the customer to send it.]" : ""),
           designUrl: res[0], artUrls: res[1].filter(Boolean)
         };
       });
-    })).then(function (clean) {
+    })).then(function (items) {
       return EEStaff.api("/api/orders", {
         action: "create", hp: $("hp").value,
         order: {
           customer: { name: name, phone: phone, email: $("cEmail").value.trim() },
-          neededBy: $("cDate").value, notes: $("cNotes").value.trim(), items: clean
+          neededBy: $("cDate").value, notes: $("cNotes").value.trim(), items: items
         }
       });
     }).then(function (data) {
       $("doneId").textContent = data.id;
       $("donePay").textContent = shop.payNote || "";
       if (staffMode) { $("doneBtn").textContent = "See all orders"; $("doneBtn").href = "orders.html"; }
-      items = [];
-      show("done");
+      cart = []; cur = null;
+      paintCart();
+      btn.disabled = false; btn.textContent = "Place order";
+      location.hash = "#/done";
     }).catch(function (err) {
-      msg.textContent = err.message + " Nothing was lost — tap the button to try again.";
-      btn.disabled = false; btn.textContent = "✔ Place my order";
+      msg.textContent = err.message + " Nothing was lost. Please try again.";
+      btn.disabled = false; btn.textContent = "Place order";
     });
   });
 
-  document.addEventListener("click", function (e) {
-    var go = e.target.closest("[data-go]");
-    if (go) show(go.getAttribute("data-go"));
-  });
-
-  // Don't lose a half-finished order by accident.
+  // Don't lose a cart by accident.
   window.addEventListener("beforeunload", function (e) {
-    if (items.length || cur) { e.preventDefault(); e.returnValue = ""; }
+    if (cart.length) { e.preventDefault(); e.returnValue = ""; }
   });
 
-  /* ---------- start ---------- */
+  /* ---------- pages (so the Back button works) ---------- */
+  function route() {
+    if (!shop) return;
+    var h = location.hash.replace(/^#\/?/, "");
+    document.querySelector(".main-nav").classList.remove("open");
+    if (h.indexOf("p/") === 0) {
+      var p = shop.products.filter(function (x) { return x.id === h.slice(2); })[0];
+      if (p) { openProduct(p); return; }
+    }
+    if (h === "checkout" && cart.length) { document.title = "Checkout | Everything Embroidered"; show("checkout"); return; }
+    if (h === "done" && $("doneId").textContent) { document.title = "Order placed | Everything Embroidered"; show("done"); return; }
+    document.title = "Shop | Everything Embroidered";
+    show("grid");
+  }
+  window.addEventListener("hashchange", route);
+
   function begin() {
     $("payNote").textContent = shop.payNote || "";
     $("cDate").min = new Date().toISOString().slice(0, 10);
-    paintProducts();
-    show("pick");
+    paintGrid();
+    paintCart();
+    route();
   }
 
   fetch("/api/shop").then(function (r) { return r.json(); }).then(function (data) {
@@ -432,16 +672,13 @@
     EEStaff.requireLogin(function () {
       staffMode = true;
       $("staffNote").hidden = false;
-      $("staffNote").textContent = shop.open
+      $("staffNote").innerHTML = (shop.open
         ? "Staff mode: you're taking this order for a customer."
-        : "Staff only: customers can't see this page yet. Orders placed here are real and show up on the Orders page.";
-      $("homeLink").textContent = "← Staff home";
-      $("homeLink").href = "staff.html";
+        : "Staff only: customers can't see the shop yet. Orders placed here are real and show up on the Orders page.") +
+        ' &nbsp; <a href="staff.html" style="text-decoration:underline; font-weight:600;">Staff home</a>';
       begin();
     });
-  }).catch(function () {
-    show("closed");
-  });
+  }).catch(function () { show("closed"); });
 })();
 </script>
 </body>
