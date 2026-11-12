@@ -2,7 +2,9 @@
    THE SHOP — one file controls the whole online store.
 
    • To OPEN the order page to the public: change  open: false
-     to  open: true  below, then push. That's the only switch.
+     to  open: true  below, then push. That's the only switch:
+     customers no longer need to sign in, and an "Order Online"
+     link appears in the menu at the top of every page.
    • To change a price or add a product: edit the list below.
      "from" is the starting price shown to customers. The final
      price is always confirmed by staff before work starts.
@@ -30,7 +32,8 @@ export default {
     { name: "Tan",    hex: "#D8C3A0" }
   ],
 
-  // shape: which picture the designer draws. sized: asks for sizes.
+  // shape: which photo the designer shows (null = no picture, the customer
+  // just describes it). sized: asks for sizes. askQty: asks how many.
   products: [
     { id: "tshirt",  name: "T-Shirt",            from: 25, shape: "tshirt", sized: true  },
     { id: "polo",    name: "Polo Shirt",         from: 25, shape: "polo",   sized: true  },
@@ -38,8 +41,9 @@ export default {
     { id: "hat",     name: "Hat / Cap",          from: 25, shape: "hat",    sized: false },
     { id: "tote",    name: "Tote Bag",           from: 25, shape: "tote",   sized: false },
     { id: "towel",   name: "Towel / Blanket",    from: 25, shape: "towel",  sized: false },
-    { id: "stocking", name: "Christmas Stocking", from: 20, shape: "stocking", sized: false },
-    { id: "own",     name: "My Own Item",        from: 20, shape: "towel",  sized: false,
+    { id: "stocking", name: "Christmas Stocking", from: 20, shape: null, sized: false, askQty: true,
+      hint: "Tell us the names and colours you'd like." },
+    { id: "own",     name: "My Own Item",        from: 20, shape: null,     sized: false, askQty: true,
       hint: "Bring it to the shop and we'll customize it." },
     { id: "other",   name: "Something Else",     from: null, shape: null,   sized: false,
       hint: "Tell us what you need and we'll make it happen." }

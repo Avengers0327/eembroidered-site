@@ -213,7 +213,7 @@
 
   function startItem(p) {
     cur = { product: p, color: p.shape ? shop.colors[0] : null, sizes: {}, qty: 1 };
-    if (p.shape) paintOptions(); else openDesign();
+    if (p.shape || p.askQty) paintOptions(); else openDesign();
   }
 
   /* ---------- 2. options ---------- */
@@ -249,7 +249,7 @@
       });
       $("colors").appendChild(b);
     });
-    $("colorBlock").hidden = p.id === "own";
+    $("colorBlock").hidden = !p.shape || p.id === "own";
     $("qtys").innerHTML = "";
     if (p.sized) {
       $("qtyQ").textContent = "How many of each size?";
@@ -293,7 +293,7 @@
   }
 
   $("designBack").addEventListener("click", function () {
-    if (cur.product.shape) show("options"); else show("pick");
+    if (cur.product.shape || cur.product.askQty) show("options"); else show("pick");
   });
 
   $("designNext").addEventListener("click", function () {

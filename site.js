@@ -37,7 +37,25 @@
     }
   }
 
+  // When shop-config.js says open: true, add "Order Online" to the top menu
+  // and tidy the footer link. Nothing else needs editing to launch.
+  function showShopLink() {
+    fetch("/api/shop").then(function (r) { return r.json(); }).then(function (shop) {
+      if (!shop || !shop.open) return;
+      var nav = document.querySelector("nav.main-nav");
+      if (nav && !nav.querySelector('a[href="/order"]')) {
+        var a = document.createElement("a");
+        a.href = "/order";
+        a.className = "stitch-underline";
+        a.textContent = "Order Online";
+        nav.insertBefore(a, nav.querySelector(".nav-cta"));
+      }
+      document.querySelectorAll('.footer-links a[href="/order"]').forEach(function (l) { l.textContent = "Order Online"; });
+    }).catch(function () {});
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    showShopLink();
     var unlocked = false;
     try { unlocked = localStorage.getItem(KEY) === "1"; } catch (e) {}
     if (unlocked) showButton();

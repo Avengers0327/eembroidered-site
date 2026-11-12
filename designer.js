@@ -12,51 +12,37 @@
 
   var W = 600, H = 680;
 
-  // Every product picture is drawn from these outlines (600 x 680 space).
-  // area = the dotted box where the design goes.
+  // Real photos of blank white items (transparent background). The designer
+  // tints the photo to the chosen colour and blends the design into the fabric.
+  // area = the dotted box where the design goes, as fractions of the photo.
   var SHAPES = {
-    tshirt: {
-      body: "M200 70 Q300 130 400 70 L520 120 L580 250 L490 290 L470 230 L470 640 L130 640 L130 230 L110 290 L20 250 L80 120 Z",
-      lines: ["M200 70 Q300 150 400 70", "M130 230 L150 150", "M470 230 L450 150"],
-      area: { x: 185, y: 175, w: 230, h: 300 }, apparel: true
-    },
-    polo: {
-      body: "M200 70 Q300 110 400 70 L520 120 L580 250 L490 290 L470 230 L470 640 L130 640 L130 230 L110 290 L20 250 L80 120 Z",
-      lines: ["M200 70 L262 160 L300 118 L338 160 L400 70", "M300 118 L300 250", "M130 230 L150 150", "M470 230 L450 150"],
-      dots: [[300, 160], [300, 200], [300, 240]],
-      area: { x: 185, y: 265, w: 230, h: 260 }, apparel: true, chestY: 0.02
-    },
-    hoodie: {
-      under: "M205 100 Q300 -30 395 100 Q300 190 205 100 Z",
-      body: "M210 90 Q300 150 390 90 L500 140 L585 520 L505 545 L455 300 L455 640 L145 640 L145 300 L95 545 L15 520 L100 140 Z",
-      lines: ["M210 90 Q300 170 390 90", "M215 500 L385 500 L410 600 L190 600 Z", "M280 150 L275 240", "M320 150 L325 240", "M145 300 L165 190", "M455 300 L435 190"],
-      area: { x: 190, y: 215, w: 220, h: 250 }, apparel: true
-    },
-    hat: {
-      under: "M95 430 Q300 370 505 430 Q540 520 300 535 Q60 520 95 430 Z",
-      body: "M120 430 Q100 150 300 140 Q500 150 480 430 Q300 380 120 430 Z",
-      lines: ["M300 140 Q290 280 300 392", "M205 165 Q170 290 190 408", "M395 165 Q430 290 410 408"],
-      dots: [[300, 140]],
-      area: { x: 205, y: 215, w: 190, h: 150 }
-    },
-    tote: {
-      handles: ["M205 260 Q205 70 300 70 Q395 70 395 260"],
-      body: "M120 250 L480 250 L465 640 L135 640 Z",
-      lines: ["M120 290 L480 290"],
-      area: { x: 175, y: 330, w: 250, h: 260 }
-    },
-    towel: {
-      body: "M120 50 Q120 40 130 40 L470 40 Q480 40 480 50 L480 630 Q480 640 470 640 L130 640 Q120 640 120 630 Z",
-      lines: ["M120 545 L480 545", "M120 570 L480 570", "M120 110 L480 110"],
-      area: { x: 165, y: 150, w: 270, h: 360 }
-    },
-    stocking: {
-      body: "M225 120 L405 120 L405 400 Q405 470 345 520 L255 610 Q195 660 130 620 Q65 570 130 505 L225 420 Z",
-      cuff: "M210 45 Q210 35 220 35 L410 35 Q420 35 420 45 L420 150 Q420 160 410 160 L220 160 Q210 160 210 150 Z",
-      lines: ["M150 520 Q200 540 240 620"],
-      area: { x: 228, y: 58, w: 174, h: 80 }
-    }
+    tshirt: { src: "/mockups/tshirt.webp", area: { x: 0.30, y: 0.24, w: 0.40, h: 0.52 }, apparel: true },
+    polo:   { src: "/mockups/polo.webp",   area: { x: 0.30, y: 0.34, w: 0.40, h: 0.46 }, apparel: true },
+    hoodie: { src: "/mockups/hoodie.webp", area: { x: 0.30, y: 0.30, w: 0.40, h: 0.32 }, apparel: true },
+    hat:    { src: "/mockups/hat.webp",    area: { x: 0.30, y: 0.22, w: 0.40, h: 0.32 } },
+    tote:   { src: "/mockups/tote.webp",   area: { x: 0.22, y: 0.42, w: 0.56, h: 0.44 } },
+    towel:  { src: "/mockups/towel.webp",  area: { x: 0.20, y: 0.12, w: 0.60, h: 0.42 } }
   };
+  var SCALE = 1.5; // canvas pixels per design unit, for a sharp picture
+  var photos = {};  // src -> { img, ready, waiting: [fn] }
+
+  function loadPhoto(src, done) {
+    var p = photos[src];
+    if (!p) {
+      p = photos[src] = { img: new Image(), ready: false, waiting: [] };
+      p.img.onload = function () { p.ready = true; p.waiting.forEach(function (f) { f(); }); p.waiting = []; };
+      p.img.src = src;
+    }
+    if (p.ready) done(); else p.waiting.push(done);
+  }
+
+  function layerCanvas() {
+    var c = document.createElement("canvas");
+    c.width = W * SCALE; c.height = H * SCALE;
+    var x = c.getContext("2d");
+    x.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+    return { c: c, x: x };
+  }
 
   var PLACEMENTS = [
     { id: "left", label: "Left chest", cx: 0.76, cy: 0.12, size: 0.30 },
@@ -137,9 +123,14 @@
     var wrap = el("div", "eed");
     var stage = el("div", "eed-stage");
     var canvas = el("canvas");
-    canvas.width = W; canvas.height = H;
+    canvas.width = W * SCALE; canvas.height = H * SCALE;
     canvas.setAttribute("aria-label", "Design preview");
     var ctx = canvas.getContext("2d");
+    ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+    var tinted = layerCanvas();   // the item, in the chosen colour
+    var tintedKey = "";
+    var art = layerCanvas();      // the design by itself
+    var worn = layerCanvas();     // the design with the fabric showing through
     stage.appendChild(canvas);
     stage.appendChild(el("p", "eed-tip", "Drag your design with your finger or mouse to move it."));
 
@@ -225,43 +216,102 @@
 
     /* ---------- drawing ---------- */
     function shape() { return SHAPES[shapeName]; }
+    function photo() { var p = photos[shape().src]; return p && p.ready ? p.img : null; }
+
+    // Where the photo sits on the canvas (fitted, centred).
+    function frame() {
+      var img = photo(), pad = 26;
+      var iw = img ? img.naturalWidth : 1, ih = img ? img.naturalHeight : 1;
+      var k = Math.min((W - pad * 2) / iw, (H - pad * 2) / ih);
+      var w = iw * k, h = ih * k;
+      return { x: (W - w) / 2, y: (H - h) / 2, w: w, h: h };
+    }
+    // The dotted box, in canvas units.
+    function area() {
+      var f = frame(), a = shape().area;
+      return { x: f.x + a.x * f.w, y: f.y + a.y * f.h, w: a.w * f.w, h: a.h * f.h };
+    }
+
+    // Tint the white photo: multiply keeps every fold and shadow of the fabric.
+    function paintTinted() {
+      var key = shapeName + color;
+      if (tintedKey === key) return;
+      var img = photo(), f = frame(), x = tinted.x;
+      x.globalCompositeOperation = "source-over";
+      x.clearRect(0, 0, W, H);
+      if (!img) return;
+      x.filter = "contrast(1.18)";
+      x.drawImage(img, f.x, f.y, f.w, f.h);
+      x.filter = "none";
+      if (color.toUpperCase() !== "#FFFFFF") {
+        x.globalCompositeOperation = "multiply";
+        x.fillStyle = color;
+        x.fillRect(0, 0, W, H);
+        if (isDark(color)) { // lift dark fabric a little so folds stay visible
+          x.globalCompositeOperation = "screen";
+          x.globalAlpha = 0.10;
+          x.drawImage(img, f.x, f.y, f.w, f.h);
+          x.globalAlpha = 1;
+        }
+        x.globalCompositeOperation = "destination-in";
+        x.drawImage(img, f.x, f.y, f.w, f.h);
+        x.globalCompositeOperation = "source-over";
+      }
+      tintedKey = key;
+    }
 
     function drawGarment() {
-      var s = shape();
-      var dark = isDark(color);
-      var edge = dark ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.28)";
-      var shade = dark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)";
-      ctx.lineJoin = "round"; ctx.lineCap = "round";
-
-      (s.handles || []).forEach(function (d) {
-        var hp = new Path2D(d);
-        ctx.strokeStyle = edge; ctx.lineWidth = 31; ctx.stroke(hp);
-        ctx.strokeStyle = color; ctx.lineWidth = 26; ctx.stroke(hp);
-      });
-      if (s.under) {
-        var u = new Path2D(s.under);
-        ctx.fillStyle = color; ctx.fill(u);
-        ctx.fillStyle = dark ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.16)"; ctx.fill(u);
-        ctx.strokeStyle = edge; ctx.lineWidth = 3; ctx.stroke(u);
+      var img = photo();
+      if (!img) {
+        ctx.fillStyle = "#7A7365"; ctx.font = "600 20px Inter, Arial, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText("Loading picture…", W / 2, H / 2);
+        return;
       }
-      var body = new Path2D(s.body);
+      paintTinted();
       ctx.save();
-      ctx.shadowColor = "rgba(28,43,58,0.22)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10;
-      ctx.fillStyle = color; ctx.fill(body);
+      ctx.shadowColor = "rgba(28,43,58,0.28)"; ctx.shadowBlur = 30; ctx.shadowOffsetY = 8 * SCALE;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(tinted.c, 0, 0);
       ctx.restore();
-      ctx.strokeStyle = edge; ctx.lineWidth = 3; ctx.stroke(body);
-      if (s.cuff) {
-        var c = new Path2D(s.cuff);
-        ctx.fillStyle = "#FFFFFF"; ctx.fill(c);
-        ctx.strokeStyle = "rgba(0,0,0,0.25)"; ctx.stroke(c);
-      }
-      ctx.strokeStyle = shade; ctx.lineWidth = 3;
-      (s.lines || []).forEach(function (d) { ctx.stroke(new Path2D(d)); });
-      ctx.strokeStyle = edge;
-      (s.dots || []).forEach(function (p) {
-        ctx.beginPath(); ctx.arc(p[0], p[1], 5, 0, Math.PI * 2);
-        ctx.fillStyle = shade; ctx.fill(); ctx.stroke();
+    }
+
+    // The design, pressed into the fabric: folds and weave show through it,
+    // it stops at the edge of the item, and it sits slightly raised like thread.
+    function drawDesign() {
+      var img = photo(), f = frame();
+      if (!img || !layers.length) return;
+      var a = art.x, w = worn.x;
+      a.clearRect(0, 0, W, H);
+      layers.forEach(function (l) {
+        if (l.type === "img") {
+          var b = box(l);
+          a.drawImage(l.img, b.x, b.y, b.w, b.h);
+        } else {
+          a.font = fontOf(l);
+          a.textAlign = "center"; a.textBaseline = "middle";
+          a.fillStyle = l.color;
+          a.fillText(l.text, l.cx, l.cy);
+        }
       });
+      w.globalCompositeOperation = "source-over";
+      w.clearRect(0, 0, W, H);
+      w.save(); w.setTransform(1, 0, 0, 1, 0, 0); w.drawImage(art.c, 0, 0); w.restore();
+      w.globalCompositeOperation = "multiply";       // fabric shading over the design
+      w.filter = "contrast(1.35)";
+      w.drawImage(img, f.x, f.y, f.w, f.h);
+      w.filter = "none";
+      w.globalCompositeOperation = "destination-in"; // keep only the design...
+      w.save(); w.setTransform(1, 0, 0, 1, 0, 0); w.drawImage(art.c, 0, 0); w.restore();
+      w.drawImage(img, f.x, f.y, f.w, f.h);          // ...and only where the item is
+      w.globalCompositeOperation = "source-over";
+
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.38)"; ctx.shadowBlur = 2.5 * SCALE; ctx.shadowOffsetY = 1 * SCALE;
+      ctx.globalAlpha = 0.97;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(worn.c, 0, 0);
+      ctx.restore();
     }
 
     function fontOf(l) {
@@ -281,31 +331,22 @@
 
     function draw(forExport) {
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#F3EEE4";
+      var bg = ctx.createRadialGradient(W / 2, H * 0.45, 60, W / 2, H * 0.45, H * 0.75);
+      bg.addColorStop(0, "#FBF9F5"); bg.addColorStop(1, "#E4DDD0");
+      ctx.fillStyle = bg;
       ctx.fillRect(0, 0, W, H);
       drawGarment();
+      drawDesign();
 
-      var a = shape().area;
-      if (!forExport) {
+      if (!forExport && photo()) {
+        var a = area();
         ctx.save();
         ctx.setLineDash([8, 8]);
-        ctx.strokeStyle = isDark(color) && shapeName !== "stocking" ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.3)";
+        ctx.strokeStyle = isDark(color) ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.3)";
         ctx.lineWidth = 2;
         ctx.strokeRect(a.x, a.y, a.w, a.h);
         ctx.restore();
       }
-
-      layers.forEach(function (l) {
-        if (l.type === "img") {
-          var b = box(l);
-          ctx.drawImage(l.img, b.x, b.y, b.w, b.h);
-        } else {
-          ctx.font = fontOf(l);
-          ctx.textAlign = "center"; ctx.textBaseline = "middle";
-          ctx.fillStyle = l.color;
-          ctx.fillText(l.text, l.cx, l.cy);
-        }
-      });
 
       if (!forExport && selected) {
         var s = box(selected);
@@ -323,12 +364,12 @@
 
     function autoInk() {
       if (ink) return ink;
-      return (shapeName === "stocking" || !isDark(color)) ? "#1C2B3A" : "#FFFFFF";
+      return isDark(color) ? "#FFFFFF" : "#1C2B3A";
     }
 
     /* ---------- adding things ---------- */
     function centerOfArea() {
-      var a = shape().area;
+      var a = area();
       return { x: a.x + a.w / 2, y: a.y + a.h / 2 };
     }
 
@@ -338,10 +379,10 @@
       var url = URL.createObjectURL(file);
       var img = new Image();
       img.onload = function () {
-        var a = shape().area, c = centerOfArea();
+        var a = area(), c = centerOfArea();
         var aspect = img.naturalWidth / img.naturalHeight;
-        var w = Math.min(a.w * 0.8, a.h * 0.8 * aspect);
-        var layer = { type: "img", img: img, aspect: aspect, w: w, cx: c.x, cy: c.y };
+        var w = Math.min(a.w * 0.7, a.h * 0.6 * aspect);
+        var layer = { type: "img", img: img, aspect: aspect, w: w, cx: c.x, cy: a.y + (w / aspect) / 2 + a.h * 0.06 };
         layers.push(layer);
         files.push(file);
         selected = layer;
@@ -357,14 +398,17 @@
     function addText(text) {
       text = String(text || "").trim();
       if (!text) { textIn.focus(); return; }
-      var a = shape().area, c = centerOfArea();
+      var a = area(), c = centerOfArea();
       var layer = { type: "text", text: text, font: fontIdx, color: autoInk(), size: 48, cx: c.x, cy: c.y };
       // shrink long words so they start inside the dotted box
       ctx.font = fontOf(layer);
       var w = ctx.measureText(text).width;
       if (w > a.w * 0.95) layer.size = Math.max(14, Math.floor(48 * (a.w * 0.95) / w));
       if (layer.size * 1.2 > a.h) layer.size = Math.floor(a.h / 1.3);
-      if (layers.length) layer.cy = Math.min(a.y + a.h - layer.size, c.y + a.h * 0.3);
+      if (layers.length) { // sit just under whatever is already there
+        var low = Math.max.apply(null, layers.map(function (l) { var b = box(l); return b.y + b.h; }));
+        layer.cy = Math.min(H - layer.size, low + layer.size * 0.75);
+      }
       layers.push(layer);
       selected = layer;
       textIn.value = "";
@@ -372,7 +416,7 @@
     }
 
     function applyPlacement(p) {
-      var a = shape().area;
+      var a = area();
       placement = p.label;
       if (!layers.length) { draw(); return; }
       // move everything together, keeping the pieces arranged as they are
@@ -384,7 +428,7 @@
       });
       var gw = maxX - minX, gcx = (minX + maxX) / 2, gcy = (minY + maxY) / 2;
       var k = (a.w * p.size) / gw;
-      var tx = a.x + a.w * p.cx, ty = a.y + a.h * (p.cy + (shape().chestY || 0)) + ((maxY - minY) * k) / 2;
+      var tx = a.x + a.w * p.cx, ty = a.y + a.h * p.cy + ((maxY - minY) * k) / 2;
       layers.forEach(function (l) {
         l.cx = tx + (l.cx - gcx) * k;
         l.cy = ty + (l.cy - gcy) * k;
@@ -482,21 +526,29 @@
     }
 
     draw();
+    loadPhoto(shape().src, function () { draw(); });
+    Object.keys(SHAPES).forEach(function (k) { loadPhoto(SHAPES[k].src, function () {}); });
 
     /* ---------- what the pages use ---------- */
     return {
       setShape: function (name) {
         if (!SHAPES[name] || name === shapeName) return;
-        var from = shape().area;
+        var had = photo() ? area() : null;
         shapeName = name;
-        var to = shape().area;
-        var k = Math.min(to.w / from.w, to.h / from.h, 1.4);
-        layers.forEach(function (l) { // carry the design over to the new item
-          l.cx = to.x + to.w / 2 + (l.cx - (from.x + from.w / 2)) * k;
-          l.cy = to.y + to.h / 2 + (l.cy - (from.y + from.h / 2)) * k;
-          if (l.type === "img") l.w *= k; else l.size = Math.max(10, l.size * k);
+        loadPhoto(shape().src, function () {
+          if (shapeName !== name) return;
+          var to = area();
+          if (had) {
+            var k = Math.min(to.w / had.w, to.h / had.h);
+            layers.forEach(function (l) { // carry the design over to the new item
+              l.cx = to.x + to.w / 2 + (l.cx - (had.x + had.w / 2)) * k;
+              l.cy = to.y + to.h / 2 + (l.cy - (had.y + had.h / 2)) * k;
+              if (l.type === "img") l.w *= k; else l.size = Math.max(10, l.size * k);
+            });
+          }
+          placement = "";
+          draw();
         });
-        placement = "";
         draw();
       },
       setColor: function (hex) {
