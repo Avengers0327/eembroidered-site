@@ -25,3 +25,5 @@
   X-Robots-Tag: noindex, nofollow
 /mockup*
   X-Robots-Tag: noindex, nofollow
+/staff-login*
+  X-Robots-Tag: noindex, nofollow

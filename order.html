@@ -420,8 +420,8 @@
     shop = data;
     var wantsStaff = /[?&]staff=1/.test(location.search);
     if (shop.open && !wantsStaff) { begin(); return; }
-    if (!EEStaff.pw() && !wantsStaff) { show("closed"); return; }
-    // closed to the public (or staff asked for staff mode): staff sign-in required
+    // Closed to the public (or staff asked for staff mode). The server only
+    // sends this page to signed-in staff in that case.
     EEStaff.requireLogin(function () {
       staffMode = true;
       $("staffNote").hidden = false;

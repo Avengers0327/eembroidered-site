@@ -70,32 +70,34 @@
       e.preventDefault();
       msg.textContent = "";
       btn.disabled = true; btn.textContent = "Checking…";
-      api("/api/orders", { action: "check" }, input.value).then(function () {
+      api("/api/login", { password: input.value }, "").then(function () {
         setPw(input.value);
         veil.remove();
         done();
       }).catch(function (err) {
-        msg.textContent = err.code === "auth" ? "That password isn't right. Try again." : err.message;
+        msg.textContent = err.message;
         btn.disabled = false; btn.textContent = "Sign in";
         input.select();
       });
     });
   }
 
-  // Runs `done` once the person is signed in (asks for the password if needed).
+  // The server only sends staff pages to signed-in devices, so by the time
+  // this runs the person is signed in. If the session has gone stale
+  // (password changed), send them back to the sign-in page.
   function requireLogin(done) {
-    if (!getPw()) { showLogin(done); return; }
-    api("/api/orders", { action: "check" }).then(done).catch(function (err) {
-      if (err.code === "auth") { setPw(""); showLogin(done, "Please sign in again."); }
-      else if (err.code === "offline") { done(); } // let the page show its own offline message
-      else showLogin(done, err.message);
+    api("/api/login", { check: true, password: getPw() }, "").then(done, function (err) {
+      if (err.code === "offline" || err.code === "setup" || !getPw()) { done(); return; }
+      setPw("");
+      location.href = "/staff-login?next=" + encodeURIComponent(location.pathname + location.search);
     });
   }
 
   function logout() {
     setPw("");
-    location.href = "/";
+    api("/api/login", { logout: true }, "").then(go, go);
+    function go() { location.href = "/"; }
   }
 
-  window.EEStaff = { pw: getPw, api: api, toast: toast, requireLogin: requireLogin, logout: logout };
+  window.EEStaff = { pw: getPw, api: api, toast: toast, requireLogin: requireLogin, showLogin: showLogin, logout: logout };
 })();

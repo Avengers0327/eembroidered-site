@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Sign-in | Everything Embroidered</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="staff.css">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body class="big">
+<script src="staff.js"></script>
+<script>
+(function () {
+  "use strict";
+  var next = new URLSearchParams(location.search).get("next") || "/staff";
+  // only ever send people to a page on this site
+  if (next.charAt(0) !== "/" || next.charAt(1) === "/" || next.charAt(1) === "\\") next = "/staff";
+  EEStaff.showLogin(function () { location.replace(next); });
+})();
+</script>
+</body>
+</html>

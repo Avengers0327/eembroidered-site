@@ -10,6 +10,7 @@
                       new order ("off" disables it)
    ========================================================== */
 import shop from "../../shop-config.js";
+import { isStaff } from "../../lib/auth.js";
 
 const STATUSES = ["new", "making", "ready", "done", "cancelled"];
 const DEFAULT_NOTIFY = "https://formspree.io/f/xpqvvwnz";
@@ -19,21 +20,6 @@ function json(body, status) {
     status: status || 200,
     headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
-}
-
-async function sha256(text) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-// Compare hashes rather than raw strings so timing doesn't leak the password.
-async function isStaff(request, env) {
-  const given = request.headers.get("X-Admin-Password");
-  if (!given || !env.ADMIN_PASSWORD) return false;
-  const a = await sha256(given), b = await sha256(env.ADMIN_PASSWORD);
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
 }
 
 const str = (v, max) => String(v == null ? "" : v).trim().slice(0, max);
