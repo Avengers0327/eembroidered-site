@@ -12,3 +12,7 @@ desktop.ini
 # If you ever add build tooling later
 node_modules/
 .env
+
+# Local testing
+.dev.vars
+.wrangler/

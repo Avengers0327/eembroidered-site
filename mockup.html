@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Make a Mockup | Everything Embroidered</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="staff.css">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<style>
+  .step-h { display: flex; align-items: center; gap: 12px; margin: 30px 0 14px; }
+  .step-h .num {
+    width: 44px; height: 44px; border-radius: 50%; background: var(--navy); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 600; flex-shrink: 0;
+  }
+  .step-h h2 { font-size: 1.6rem; margin: 0; }
+
+  .choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .choice {
+    background: #fff; border: 3px solid #D9CFBD; border-radius: 16px; padding: 18px 10px;
+    font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--navy);
+    cursor: pointer; min-height: 64px;
+  }
+  .choice.on { border-color: var(--terracotta); background: #FBEFE9; }
+
+  .swatches { display: flex; flex-wrap: wrap; gap: 14px; }
+  .swatch { background: none; border: none; cursor: pointer; text-align: center; padding: 0; font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--navy); }
+  .swatch i { display: block; width: 62px; height: 62px; border-radius: 50%; border: 3px solid #D9CFBD; margin: 0 auto 4px; }
+  .swatch.on i { border-color: var(--terracotta); box-shadow: 0 0 0 4px rgba(193,97,61,0.35); }
+
+  .finish { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+</style>
+</head>
+<body class="big">
+
+<div class="top-bar">
+  <div class="name">Everything <span>Embroidered</span> · Mockup</div>
+  <div class="links"><a href="staff.html">← Staff home</a></div>
+</div>
+
+<div class="page">
+  <h1>Make a mockup</h1>
+  <p class="intro">Show a customer what their design will look like. Follow the steps from top to bottom.</p>
+
+  <div class="step-h"><div class="num">1</div><h2>Pick the item</h2></div>
+  <div class="choices" id="items"></div>
+
+  <div class="step-h"><div class="num">2</div><h2>Pick the colour</h2></div>
+  <div class="swatches" id="colors"></div>
+
+  <div class="step-h"><div class="num">3</div><h2>Add the logo or words</h2></div>
+  <div id="designer"></div>
+
+  <div class="step-h"><div class="num">4</div><h2>Finished? Save it or send it</h2></div>
+  <div class="field">
+    <label for="cust">Customer's name <span class="hint">(optional — it goes in the picture's file name)</span></label>
+    <input type="text" id="cust" placeholder="e.g. Maria Lopez">
+  </div>
+  <div class="finish">
+    <button class="bigbtn green" id="send">📤 Send to the customer<span class="sub">Text or email the picture</span></button>
+    <button class="bigbtn navy" id="save">💾 Save the picture<span class="sub">Keeps it on this device</span></button>
+    <button class="bigbtn danger" id="reset">🔄 Start over</button>
+  </div>
+</div>
+
+<script src="staff.js"></script>
+<script src="designer.js"></script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+
+  var ITEMS = [
+    ["tshirt", "👕 T-Shirt"], ["polo", "👔 Polo"], ["hoodie", "🧥 Hoodie"], ["hat", "🧢 Hat"],
+    ["tote", "👜 Tote bag"], ["towel", "🛁 Towel / Blanket"], ["stocking", "🎄 Stocking"]
+  ];
+  var COLORS = [
+    ["White", "#FFFFFF"], ["Black", "#1E1E1E"], ["Navy", "#1C2B3A"], ["Gray", "#9A9DA1"], ["Red", "#B3261E"],
+    ["Royal", "#2452A6"], ["Forest", "#233D2E"], ["Pink", "#F2A7BB"], ["Tan", "#D8C3A0"]
+  ];
+
+  var d = EEDesigner.create($("designer"), { shape: "tshirt", color: "#FFFFFF" });
+
+  ITEMS.forEach(function (it, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "choice" + (i === 0 ? " on" : ""); b.textContent = it[1];
+    b.addEventListener("click", function () {
+      d.setShape(it[0]);
+      document.querySelectorAll(".choice").forEach(function (x) { x.classList.toggle("on", x === b); });
+    });
+    $("items").appendChild(b);
+  });
+
+  function paintColors(list) {
+    $("colors").innerHTML = "";
+    list.forEach(function (c, i) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "swatch" + (i === 0 ? " on" : "");
+      b.innerHTML = "<i></i>";
+      b.firstChild.style.background = c[1];
+      b.appendChild(document.createTextNode(c[0]));
+      b.addEventListener("click", function () {
+        d.setColor(c[1]);
+        document.querySelectorAll(".swatch").forEach(function (x) { x.classList.toggle("on", x === b); });
+      });
+      $("colors").appendChild(b);
+    });
+  }
+  paintColors(COLORS);
+  // use the shop's own colour list when it's reachable
+  fetch("/api/shop").then(function (r) { return r.json(); }).then(function (shop) {
+    if (shop.colors && shop.colors.length) paintColors(shop.colors.map(function (c) { return [c.name, c.hex]; }));
+  }).catch(function () {});
+
+  function fileName() {
+    var n = $("cust").value.trim().replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");
+    return "mockup" + (n ? "-" + n : "") + ".png";
+  }
+
+  function download(blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = fileName();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  function needDesign() {
+    if (d.hasContent()) return false;
+    EEStaff.toast("Add a logo or some words first (step 3).");
+    $("designer").scrollIntoView({ behavior: "smooth" });
+    return true;
+  }
+
+  $("save").addEventListener("click", function () {
+    if (needDesign()) return;
+    d.exportBlob().then(function (blob) {
+      download(blob);
+      EEStaff.toast("Saved! Look in this device's Downloads or Photos.");
+    });
+  });
+
+  $("send").addEventListener("click", function () {
+    if (needDesign()) return;
+    d.exportBlob().then(function (blob) {
+      var file = new File([blob], fileName(), { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          text: "Here's a preview of your design from Everything Embroidered. Call or text us at (201) 916-3221 with any changes!"
+        }).catch(function () {});
+      } else {
+        download(blob);
+        EEStaff.toast("Picture saved. Now attach it to a text or email to the customer.");
+      }
+    });
+  });
+
+  $("reset").addEventListener("click", function () {
+    var b = $("reset");
+    if (!b.classList.contains("confirm")) {
+      b.classList.add("confirm"); b.textContent = "Tap again to erase everything";
+      setTimeout(function () { b.classList.remove("confirm"); b.textContent = "🔄 Start over"; }, 4000);
+      return;
+    }
+    d.clear();
+    $("cust").value = "";
+    b.classList.remove("confirm"); b.textContent = "🔄 Start over";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+})();
+</script>
+</body>
+</html>

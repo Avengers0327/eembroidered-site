@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Online | Everything Embroidered</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="staff.css">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<style>
+  .steps-bar { display: flex; justify-content: center; gap: 8px; margin: 0 0 24px; }
+  .steps-bar i { width: 46px; height: 8px; border-radius: 99px; background: #D9CFBD; }
+  .steps-bar i.on { background: var(--terracotta); }
+
+  .choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .choice {
+    background: #fff; border: 3px solid #D9CFBD; border-radius: 18px; padding: 22px 14px;
+    font-family: 'Inter', sans-serif; cursor: pointer; text-align: center; min-height: 110px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .choice:hover { border-color: var(--terracotta); transform: translateY(-2px); }
+  .choice .t { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 600; color: var(--navy); display: block; }
+  .choice .p { display: inline-block; margin-top: 8px; font-size: 0.95rem; font-weight: 700; color: var(--terracotta-dark); background: rgba(193,97,61,0.1); padding: 3px 12px; border-radius: 999px; }
+  .choice .h { display: block; margin-top: 8px; font-size: 0.95rem; color: #57534A; }
+
+  h2.q { font-size: 1.5rem; margin: 26px 0 14px; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 14px; }
+  .swatch { background: none; border: none; cursor: pointer; text-align: center; padding: 0; font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--navy); }
+  .swatch i { display: block; width: 62px; height: 62px; border-radius: 50%; border: 3px solid #D9CFBD; margin: 0 auto 4px; }
+  .swatch.on i { border-color: var(--terracotta); box-shadow: 0 0 0 4px rgba(193,97,61,0.35); }
+
+  .qty-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .qty { background: #fff; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: var(--shadow); }
+  .qty .lab { font-weight: 700; font-size: 1.1rem; color: var(--navy); }
+  .qty .ctl { display: flex; align-items: center; gap: 8px; }
+  .qty button {
+    width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--navy); background: #fff;
+    font-size: 1.6rem; font-weight: 700; color: var(--navy); cursor: pointer; line-height: 1;
+  }
+  .qty button:hover { background: var(--cream-2); }
+  .qty .num { min-width: 40px; text-align: center; font-size: 1.5rem; font-weight: 700; }
+
+  .nav { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; margin-top: 30px; }
+  @media (max-width: 560px) { .nav { grid-template-columns: 1fr; } .nav .bigbtn.plain { order: 2; } }
+
+  .cart-item { display: flex; gap: 14px; align-items: center; padding: 14px 0; border-bottom: 2px dashed #E5DDCE; }
+  .cart-item img { width: 84px; height: 95px; object-fit: cover; border-radius: 10px; background: #F3EEE4; flex-shrink: 0; }
+  .cart-item .w { flex: 1; min-width: 0; }
+  .cart-item .w b { font-size: 1.2rem; color: var(--navy); display: block; }
+  .cart-item .w span { color: #57534A; font-size: 1rem; }
+  .cart-item button { background: none; border: none; color: #B03A2E; font-weight: 700; font-size: 1rem; cursor: pointer; text-decoration: underline; padding: 8px; }
+  .estimate { font-size: 1.15rem; margin: 18px 0 0; }
+
+  .done-box { text-align: center; }
+  .done-box .tick { font-size: 4rem; line-height: 1; }
+  .done-box .num { font-family: 'Fraunces', serif; font-size: 3rem; font-weight: 600; color: var(--terracotta-dark); margin: 6px 0 14px; }
+  .hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
+</style>
+</head>
+<body class="big">
+
+<div class="top-bar">
+  <div class="name">Everything <span>Embroidered</span></div>
+  <div class="links">
+    <a href="/" id="homeLink">← Back to the website</a>
+    <a href="tel:2019163221">📞 (201) 916-3221</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="notice" id="staffNote" hidden></div>
+
+  <!-- not open yet -->
+  <section id="s-closed" hidden>
+    <div class="card" style="text-align:center; max-width:560px; margin:40px auto;">
+      <div style="font-size:3rem;">🧵</div>
+      <h1 style="font-size:2rem;">Online ordering is coming soon</h1>
+      <p class="intro" style="margin-bottom:22px;">Until then, call or text us and we'll take care of you.</p>
+      <a class="bigbtn" href="tel:2019163221">📞 Call (201) 916-3221</a>
+      <p style="margin:18px 0 0;"><a href="/contact" style="text-decoration:underline;">Or send us a quote request</a></p>
+    </div>
+  </section>
+
+  <section id="s-loading"><p class="intro" style="margin-top:60px;">Loading…</p></section>
+
+  <!-- 1. what -->
+  <section id="s-pick" hidden>
+    <div class="steps-bar"><i class="on"></i><i></i><i></i><i></i></div>
+    <h1>What would you like?</h1>
+    <p class="intro">Tap the item you want us to customize.</p>
+    <div class="choices" id="products"></div>
+    <div class="nav" id="pickBack" hidden style="grid-template-columns:1fr;">
+      <button class="bigbtn plain" data-go="cart">← Back to my order</button>
+    </div>
+  </section>
+
+  <!-- 2. colour + how many -->
+  <section id="s-options" hidden>
+    <div class="steps-bar"><i class="on"></i><i class="on"></i><i></i><i></i></div>
+    <h1 id="optTitle"></h1>
+    <div id="colorBlock">
+      <h2 class="q">Which colour?</h2>
+      <div class="swatches" id="colors"></div>
+    </div>
+    <h2 class="q" id="qtyQ">How many?</h2>
+    <div class="qty-grid" id="qtys"></div>
+    <div class="msg-err" id="optMsg"></div>
+    <div class="nav">
+      <button class="bigbtn plain" data-go="pick">← Back</button>
+      <button class="bigbtn" id="optNext">Next →</button>
+    </div>
+  </section>
+
+  <!-- 3. design -->
+  <section id="s-design" hidden>
+    <div class="steps-bar"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+    <h1>What should we put on it?</h1>
+    <p class="intro" id="designIntro">Add your logo, a picture, or some words. Not sure? Skip this and just tell us below.</p>
+    <div id="designer"></div>
+    <div class="field" style="margin-top:22px;">
+      <label for="details">Anything else we should know? <span class="hint" id="detailsHint">(optional)</span></label>
+      <textarea id="details" placeholder="Thread colours, exact wording, anything special…"></textarea>
+    </div>
+    <div class="msg-err" id="designMsg"></div>
+    <div class="nav">
+      <button class="bigbtn plain" id="designBack">← Back</button>
+      <button class="bigbtn" id="designNext">Add this to my order →</button>
+    </div>
+  </section>
+
+  <!-- 4. cart + details -->
+  <section id="s-cart" hidden>
+    <div class="steps-bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <div class="page narrow" style="padding:0;">
+      <h1>Your order</h1>
+      <div class="card">
+        <div id="cart"></div>
+        <p class="estimate" id="estimate"></p>
+        <button class="bigbtn plain small" data-go="pick" style="margin-top:16px;">＋ Add another item</button>
+      </div>
+
+      <h2 class="q">How do we reach you?</h2>
+      <div class="card">
+        <div class="field"><label for="cName">Your name</label><input type="text" id="cName" autocomplete="name"></div>
+        <div class="field"><label for="cPhone">Phone number <span class="hint">(we'll call or text to confirm your price)</span></label><input type="tel" id="cPhone" autocomplete="tel" placeholder="(201) 000-0000"></div>
+        <div class="field"><label for="cEmail">Email <span class="hint">(optional)</span></label><input type="email" id="cEmail" autocomplete="email"></div>
+        <div class="field"><label for="cDate">When do you need it by? <span class="hint">(optional)</span></label><input type="date" id="cDate"></div>
+        <div class="field" style="margin-bottom:0;"><label for="cNotes">Notes for us <span class="hint">(optional)</span></label><textarea id="cNotes"></textarea></div>
+        <input type="text" class="hp" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      </div>
+
+      <div class="notice" style="margin-top:22px;" id="payNote"></div>
+      <div class="msg-err" id="cartMsg"></div>
+      <button class="bigbtn green" id="place">✔ Place my order</button>
+    </div>
+  </section>
+
+  <!-- done -->
+  <section id="s-done" hidden>
+    <div class="card done-box" style="max-width:600px; margin:30px auto;">
+      <div class="tick">✅</div>
+      <h1 style="font-size:2.2rem; margin-top:10px;">Thank you! We got your order.</h1>
+      <p style="font-size:1.15rem; margin:0;">Your order number is</p>
+      <div class="num" id="doneId"></div>
+      <p style="font-size:1.15rem;" id="donePay"></p>
+      <p style="color:#57534A;">Questions? Call or text <a href="tel:2019163221" style="text-decoration:underline;"><b>(201) 916-3221</b></a>.</p>
+      <a class="bigbtn" id="doneBtn" href="/">Back to the website</a>
+    </div>
+  </section>
+
+</div>
+
+<script src="gallery-config.js"></script>
+<script src="staff.js"></script>
+<script src="designer.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var cfg = window.GALLERY_CONFIG || {};
+  var shop = null;
+  var staffMode = false;
+  var items = [];      // finished items in the order
+  var cur = null;      // the item being built
+  var designer = null;
+
+  function show(name) {
+    ["closed", "loading", "pick", "options", "design", "cart", "done"].forEach(function (s) { $("s-" + s).hidden = s !== name; });
+    window.scrollTo({ top: 0 });
+  }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  /* ---------- 1. pick ---------- */
+  function paintProducts() {
+    $("products").innerHTML = "";
+    shop.products.forEach(function (p) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "choice";
+      b.innerHTML = '<span class="t">' + esc(p.name) + "</span>" +
+        (p.from ? '<span class="p">From $' + p.from + "</span>" : "") +
+        (p.hint ? '<span class="h">' + esc(p.hint) + "</span>" : "");
+      b.addEventListener("click", function () { startItem(p); });
+      $("products").appendChild(b);
+    });
+  }
+
+  function startItem(p) {
+    cur = { product: p, color: p.shape ? shop.colors[0] : null, sizes: {}, qty: 1 };
+    if (p.shape) paintOptions(); else openDesign();
+  }
+
+  /* ---------- 2. options ---------- */
+  function stepper(label, get, set) {
+    var row = document.createElement("div");
+    row.className = "qty";
+    row.innerHTML = '<span class="lab"></span><span class="ctl">' +
+      '<button type="button" aria-label="One less">−</button><span class="num"></span>' +
+      '<button type="button" aria-label="One more">+</button></span>';
+    row.querySelector(".lab").textContent = label;
+    var num = row.querySelector(".num"), btns = row.querySelectorAll("button");
+    function paint() { num.textContent = get(); }
+    btns[0].addEventListener("click", function () { set(Math.max(0, get() - 1)); paint(); });
+    btns[1].addEventListener("click", function () { set(Math.min(999, get() + 1)); paint(); });
+    paint();
+    return row;
+  }
+
+  function paintOptions() {
+    var p = cur.product;
+    $("optTitle").textContent = p.name;
+    $("optMsg").textContent = "";
+    $("colors").innerHTML = "";
+    shop.colors.forEach(function (c) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "swatch" + (cur.color === c ? " on" : "");
+      b.innerHTML = "<i></i>";
+      b.firstChild.style.background = c.hex;
+      b.appendChild(document.createTextNode(c.name));
+      b.addEventListener("click", function () {
+        cur.color = c;
+        document.querySelectorAll("#colors .swatch").forEach(function (x) { x.classList.toggle("on", x === b); });
+      });
+      $("colors").appendChild(b);
+    });
+    $("colorBlock").hidden = p.id === "own";
+    $("qtys").innerHTML = "";
+    if (p.sized) {
+      $("qtyQ").textContent = "How many of each size?";
+      shop.sizes.forEach(function (s) {
+        $("qtys").appendChild(stepper(s, function () { return cur.sizes[s] || 0; }, function (v) { cur.sizes[s] = v; }));
+      });
+    } else {
+      $("qtyQ").textContent = "How many?";
+      $("qtys").appendChild(stepper("Quantity", function () { return cur.qty; }, function (v) { cur.qty = Math.max(1, v); }));
+    }
+    show("options");
+  }
+
+  $("optNext").addEventListener("click", function () {
+    if (cur.product.sized) {
+      var total = Object.keys(cur.sizes).reduce(function (n, s) { return n + cur.sizes[s]; }, 0);
+      if (!total) { $("optMsg").textContent = "Tap the + button next to a size to choose how many you need."; return; }
+      cur.qty = total;
+    }
+    openDesign();
+  });
+
+  /* ---------- 3. design ---------- */
+  function openDesign() {
+    var p = cur.product;
+    $("designMsg").textContent = "";
+    $("details").value = "";
+    $("designer").hidden = !p.shape;
+    if (p.shape) {
+      if (!designer) designer = EEDesigner.create($("designer"), { shape: p.shape, color: cur.color.hex });
+      designer.clear();
+      designer.setShape(p.shape);
+      designer.setColor(cur.color.hex);
+      $("designIntro").textContent = "Add your logo, a picture, or some words. Not sure? Skip this and just tell us below.";
+      $("detailsHint").textContent = "(optional)";
+    } else {
+      $("designIntro").textContent = "Tell us what you have in mind and we'll call you about it.";
+      $("detailsHint").textContent = "";
+    }
+    show("design");
+  }
+
+  $("designBack").addEventListener("click", function () {
+    if (cur.product.shape) show("options"); else show("pick");
+  });
+
+  $("designNext").addEventListener("click", function () {
+    var p = cur.product, details = $("details").value.trim();
+    var has = p.shape && designer.hasContent();
+    if (!has && !details) {
+      $("designMsg").textContent = p.shape
+        ? "Add a logo or words above, or type what you'd like in the box."
+        : "Please tell us a little about what you need.";
+      return;
+    }
+    var item = {
+      productId: p.id, name: p.name, from: p.from,
+      color: cur.color && p.id !== "own" ? cur.color.name : "",
+      qty: cur.qty, sizes: p.sized ? cur.sizes : {},
+      placement: has ? designer.getPlacement() : "",
+      text: has ? designer.getText() : "",
+      details: details, blob: null, files: has ? designer.getFiles() : []
+    };
+    var finish = function () { items.push(item); cur = null; paintCart(); show("cart"); };
+    if (has) designer.exportBlob().then(function (b) { item.blob = b; item.preview = URL.createObjectURL(b); finish(); });
+    else finish();
+  });
+
+  /* ---------- 4. cart ---------- */
+  function paintCart() {
+    $("cart").innerHTML = "";
+    var est = 0, unknown = false;
+    items.forEach(function (it, i) {
+      var sizes = Object.keys(it.sizes).filter(function (s) { return it.sizes[s]; }).map(function (s) { return it.sizes[s] + " " + s; }).join(", ");
+      var row = document.createElement("div");
+      row.className = "cart-item";
+      row.innerHTML = (it.preview ? '<img src="' + it.preview + '" alt="">' : "") +
+        '<div class="w"><b>' + it.qty + " × " + esc(it.name) + (it.color ? " — " + esc(it.color) : "") + "</b>" +
+        "<span>" + esc([sizes, it.text ? "“" + it.text + "”" : "", it.details].filter(Boolean).join(" · ")) + "</span></div>" +
+        '<button type="button">Remove</button>';
+      row.querySelector("button").addEventListener("click", function () {
+        items.splice(i, 1);
+        if (items.length) paintCart(); else { $("pickBack").hidden = true; show("pick"); }
+      });
+      $("cart").appendChild(row);
+      if (it.from) est += it.from * it.qty; else unknown = true;
+    });
+    $("estimate").innerHTML = est
+      ? "Starting from about <b>$" + est + "</b>" + (unknown ? " plus your custom item" : "") + ". We'll confirm your exact price before we start."
+      : "We'll call you with a price before we start.";
+    $("pickBack").hidden = !items.length;
+  }
+
+  function upload(fileOrBlob) {
+    if (!cfg.cloudName || !cfg.uploadPreset) return Promise.resolve("");
+    var form = new FormData();
+    form.append("file", fileOrBlob);
+    form.append("upload_preset", cfg.uploadPreset);
+    form.append("tags", "orders");
+    return fetch("https://api.cloudinary.com/v1_1/" + cfg.cloudName + "/image/upload", { method: "POST", body: form })
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .then(function (d) { return d.secure_url || ""; })
+      .catch(function () { return ""; });
+  }
+
+  $("place").addEventListener("click", function () {
+    var btn = $("place"), msg = $("cartMsg");
+    msg.textContent = "";
+    var name = $("cName").value.trim(), phone = $("cPhone").value.trim();
+    if (!items.length) { msg.textContent = "Your order is empty. Add an item first."; return; }
+    if (!name) { msg.textContent = "Please type your name."; $("cName").focus(); return; }
+    if (phone.replace(/\D/g, "").length < 10) { msg.textContent = "Please type your phone number with the area code."; $("cPhone").focus(); return; }
+
+    btn.disabled = true; btn.textContent = "Sending your order… please wait";
+
+    Promise.all(items.map(function (it) {
+      return Promise.all([
+        it.blob ? upload(it.blob) : Promise.resolve(""),
+        Promise.all(it.files.slice(0, 4).map(upload))
+      ]).then(function (res) {
+        var lost = (it.blob && !res[0]) || res[1].some(function (u) { return !u; });
+        return {
+          productId: it.productId, color: it.color, qty: it.qty, sizes: it.sizes,
+          placement: it.placement, text: it.text,
+          details: it.details + (lost ? " [A picture didn't upload — please ask the customer to send it.]" : ""),
+          designUrl: res[0], artUrls: res[1].filter(Boolean)
+        };
+      });
+    })).then(function (clean) {
+      return EEStaff.api("/api/orders", {
+        action: "create", hp: $("hp").value,
+        order: {
+          customer: { name: name, phone: phone, email: $("cEmail").value.trim() },
+          neededBy: $("cDate").value, notes: $("cNotes").value.trim(), items: clean
+        }
+      });
+    }).then(function (data) {
+      $("doneId").textContent = data.id;
+      $("donePay").textContent = shop.payNote || "";
+      if (staffMode) { $("doneBtn").textContent = "See all orders"; $("doneBtn").href = "orders.html"; }
+      items = [];
+      show("done");
+    }).catch(function (err) {
+      msg.textContent = err.message + " Nothing was lost — tap the button to try again.";
+      btn.disabled = false; btn.textContent = "✔ Place my order";
+    });
+  });
+
+  document.addEventListener("click", function (e) {
+    var go = e.target.closest("[data-go]");
+    if (go) show(go.getAttribute("data-go"));
+  });
+
+  // Don't lose a half-finished order by accident.
+  window.addEventListener("beforeunload", function (e) {
+    if (items.length || cur) { e.preventDefault(); e.returnValue = ""; }
+  });
+
+  /* ---------- start ---------- */
+  function begin() {
+    $("payNote").textContent = shop.payNote || "";
+    $("cDate").min = new Date().toISOString().slice(0, 10);
+    paintProducts();
+    show("pick");
+  }
+
+  fetch("/api/shop").then(function (r) { return r.json(); }).then(function (data) {
+    shop = data;
+    var wantsStaff = /[?&]staff=1/.test(location.search);
+    if (shop.open && !wantsStaff) { begin(); return; }
+    if (!EEStaff.pw() && !wantsStaff) { show("closed"); return; }
+    // closed to the public (or staff asked for staff mode): staff sign-in required
+    EEStaff.requireLogin(function () {
+      staffMode = true;
+      $("staffNote").hidden = false;
+      $("staffNote").textContent = shop.open
+        ? "Staff mode: you're taking this order for a customer."
+        : "Staff only: customers can't see this page yet. Orders placed here are real and show up on the Orders page.";
+      $("homeLink").textContent = "← Staff home";
+      $("homeLink").href = "staff.html";
+      begin();
+    });
+  }).catch(function () {
+    show("closed");
+  });
+})();
+</script>
+</body>
+</html>

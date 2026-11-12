@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders | Everything Embroidered</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="staff.css">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<style>
+  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+  .tab {
+    background: #fff; border: 3px solid transparent; border-radius: 16px;
+    padding: 14px 8px; cursor: pointer; text-align: center;
+    font-family: 'Inter', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--navy);
+    box-shadow: var(--shadow); line-height: 1.25;
+  }
+  .tab .n { display: block; font-family: 'Fraunces', serif; font-size: 2.2rem; line-height: 1.1; }
+  .tab.active { border-color: var(--navy); background: var(--navy); color: #fff; }
+  .tab.has-new:not(.active) { border-color: #B3261E; }
+  .tab.has-new .n { color: #B3261E; }
+  .tab.active .n { color: #fff; }
+  @media (max-width: 640px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+
+  .tools { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .tools input {
+    flex: 1; min-width: 220px; font-size: 1.15rem; padding: 14px 16px;
+    border: 2px solid #D9CFBD; border-radius: 12px; font-family: 'Inter', sans-serif;
+  }
+  .tools .when { color: #7A7365; font-size: 0.95rem; }
+
+  .order { margin-bottom: 20px; border-left: 10px solid var(--thread-gold); }
+  .order.s-new { border-left-color: #B3261E; }
+  .order.s-making { border-left-color: var(--thread-gold); }
+  .order.s-ready { border-left-color: #2E7D4F; }
+  .order.s-done, .order.s-cancelled { border-left-color: #B5AC9B; }
+
+  .o-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; margin-bottom: 4px; }
+  .o-name { font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 600; color: var(--navy); line-height: 1.15; }
+  .o-id { font-size: 1.15rem; font-weight: 700; color: #57534A; }
+  .o-when { color: #7A7365; font-size: 1rem; margin-bottom: 14px; }
+  .pill { display: inline-block; padding: 4px 14px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; margin-left: 6px; }
+  .pill.due { background: #FFF8E8; color: #6B5B33; border: 2px solid var(--thread-gold); }
+  .pill.late { background: #FFF3F1; color: #B03A2E; border: 2px solid #B03A2E; }
+  .pill.staff { background: #EEF2F6; color: var(--navy); }
+
+  .contact { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+
+  .items { border-top: 2px dashed #E5DDCE; }
+  .item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 2px dashed #E5DDCE; align-items: flex-start; }
+  .item .pic {
+    width: 120px; height: 136px; object-fit: cover; border-radius: 12px; background: #F3EEE4; flex-shrink: 0;
+    border: 2px solid #E5DDCE; cursor: zoom-in;
+  }
+  .item .nopic {
+    width: 120px; height: 136px; border-radius: 12px; background: #F3EEE4; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    color: #7A7365; font-size: 0.9rem; padding: 8px;
+  }
+  .item .what { font-size: 1.3rem; font-weight: 700; color: var(--navy); line-height: 1.25; }
+  .item .line { margin-top: 4px; font-size: 1.08rem; }
+  .item .line b { color: #57534A; }
+  .item .art a { color: var(--terracotta-dark); font-weight: 700; text-decoration: underline; margin-right: 14px; }
+
+  .note-box { background: #FFF8E8; border-radius: 12px; padding: 14px 16px; margin: 16px 0; font-size: 1.08rem; }
+  .note-box b { display: block; margin-bottom: 2px; color: #6B5B33; }
+
+  .staff-fields { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-top: 16px; }
+  .staff-fields .field { margin: 0; }
+  .staff-fields textarea { min-height: 64px; font-size: 1.05rem; padding: 12px; }
+  .staff-fields input { font-size: 1.05rem; padding: 12px; }
+  @media (max-width: 640px) { .staff-fields { grid-template-columns: 1fr; } }
+
+  .actions { margin-top: 18px; }
+  .more { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
+
+  .empty { text-align: center; padding: 50px 20px; color: #57534A; font-size: 1.2rem; }
+  .empty .ico { font-size: 3rem; margin-bottom: 8px; }
+
+  .zoom {
+    position: fixed; inset: 0; background: rgba(15,25,35,0.88); z-index: 250;
+    display: flex; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out;
+  }
+  .zoom img { max-width: 100%; max-height: 100%; border-radius: 12px; background: #fff; }
+
+  /* Printing one order as a work ticket */
+  @media print {
+    body.big { background: #fff; font-size: 14px; }
+    .top-bar, .tabs, .tools, .actions, .contact, .toast, .staff-fields label .hint { display: none !important; }
+    .order { display: none; box-shadow: none; border: 2px solid #000; border-left: 2px solid #000; }
+    .order.printing { display: block; }
+    .page { padding: 0; }
+    .item .pic { width: 220px; height: 250px; }
+    .print-only { display: block !important; }
+  }
+  .print-only { display: none; }
+</style>
+</head>
+<body class="big">
+
+<div class="top-bar">
+  <div class="name">Everything <span>Embroidered</span> · Orders</div>
+  <div class="links">
+    <a href="staff.html">← Staff home</a>
+    <a href="order.html?staff=1">＋ Take an order</a>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="notice err" id="problem" hidden></div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-s="new"><span class="n" id="n-new">0</span>🆕 New</button>
+    <button class="tab" data-s="making"><span class="n" id="n-making">0</span>🧵 Being made</button>
+    <button class="tab" data-s="ready"><span class="n" id="n-ready">0</span>✅ Ready for pickup</button>
+    <button class="tab" data-s="done"><span class="n" id="n-done">0</span>📦 Finished</button>
+  </div>
+
+  <div class="tools">
+    <input type="search" id="search" placeholder="🔍 Find an order — type a name, phone number, or order number">
+    <span class="when" id="when"></span>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<script src="staff.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var orders = [];
+  var tab = "new";
+  var seen = null;       // order ids we already know about (to announce new ones)
+  var editing = false;   // don't redraw while someone is typing a note
+  var $ = function (id) { return document.getElementById(id); };
+
+  var NEXT = {
+    new:    { to: "making", label: "▶ Start making this order", cls: "" },
+    making: { to: "ready",  label: "✅ It's finished — ready for pickup", cls: "green" },
+    ready:  { to: "done",   label: "📦 Customer picked it up", cls: "navy" }
+  };
+  var BACK = { making: "new", ready: "making", done: "ready", cancelled: "new" };
+  var NAMES = { new: "New", making: "Being made", ready: "Ready for pickup", done: "Finished", cancelled: "Cancelled" };
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function when(iso) {
+    var d = new Date(iso);
+    if (isNaN(d)) return "";
+    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) + " at " +
+           d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  }
+  function duePill(o) {
+    if (!o.neededBy) return "";
+    var d = new Date(o.neededBy + "T12:00:00");
+    if (isNaN(d)) return "";
+    var days = Math.round((d - new Date()) / 864e5);
+    var txt = "Needed by " + d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    var late = days <= 2 && o.status !== "done" && o.status !== "cancelled";
+    return '<span class="pill ' + (late ? "late" : "due") + '">' + (late && days < 0 ? "⚠ LATE — " : late ? "⚠ SOON — " : "") + esc(txt) + "</span>";
+  }
+  function digits(p) { return String(p || "").replace(/\D/g, ""); }
+  function thumb(url) { return url.replace("/upload/", "/upload/w_400,f_auto,q_auto/"); }
+
+  function itemHtml(it) {
+    var sizes = Object.keys(it.sizes || {}).map(function (s) { return it.sizes[s] + " × " + s; }).join(",  ");
+    var pic = it.designUrl
+      ? '<img class="pic" src="' + esc(thumb(it.designUrl)) + '" data-full="' + esc(it.designUrl) + '" alt="Design">'
+      : '<div class="nopic">No picture</div>';
+    var art = (it.artUrls || []).map(function (u, i) {
+      return '<a href="' + esc(u.replace("/upload/", "/upload/fl_attachment/")) + '" target="_blank" rel="noopener">⬇ Customer\'s file ' + (i + 1) + "</a>";
+    }).join("");
+    return '<div class="item">' + pic + "<div>" +
+      '<div class="what">' + it.qty + " × " + esc(it.name) + (it.color ? " — " + esc(it.color) : "") + "</div>" +
+      (sizes ? '<div class="line"><b>Sizes:</b> ' + esc(sizes) + "</div>" : "") +
+      (it.placement ? '<div class="line"><b>Where:</b> ' + esc(it.placement) + "</div>" : "") +
+      (it.text ? '<div class="line"><b>Words:</b> “' + esc(it.text) + "”</div>" : "") +
+      (it.details ? '<div class="line"><b>Details:</b> ' + esc(it.details) + "</div>" : "") +
+      (art ? '<div class="line art">' + art + "</div>" : "") +
+      "</div></div>";
+  }
+
+  function orderHtml(o) {
+    var phone = digits(o.customer.phone);
+    var first = (o.customer.name || "").split(" ")[0];
+    var readyMsg = "Hi " + first + ", this is Everything Embroidered at Paramus Park. Your order " + o.id + " is ready for pickup!";
+    var next = NEXT[o.status];
+
+    var h = '<div class="card order s-' + o.status + '" data-id="' + esc(o.id) + '">' +
+      '<div class="o-head"><div class="o-name">' + esc(o.customer.name) + "</div>" +
+      '<div class="o-id">Order ' + esc(o.id) + "</div></div>" +
+      '<div class="o-when">Ordered ' + esc(when(o.created)) +
+        (o.source === "staff" ? ' <span class="pill staff">Taken by staff</span>' : "") + duePill(o) + "</div>" +
+      '<div class="print-only"><b>Phone:</b> ' + esc(o.customer.phone) + (o.customer.email ? " &nbsp; <b>Email:</b> " + esc(o.customer.email) : "") +
+        " &nbsp; <b>Status:</b> " + NAMES[o.status] + "</div>" +
+
+      '<div class="contact">' +
+        '<a class="bigbtn small plain" href="tel:' + phone + '">📞 Call ' + esc(o.customer.phone) + "</a>" +
+        '<a class="bigbtn small plain" href="sms:' + phone + '">💬 Text</a>' +
+        (o.customer.email ? '<a class="bigbtn small plain" href="mailto:' + esc(o.customer.email) + '">✉ Email</a>' : "") +
+      "</div>" +
+
+      '<div class="items">' + o.items.map(itemHtml).join("") + "</div>" +
+      (o.notes ? '<div class="note-box"><b>Customer says:</b>' + esc(o.notes) + "</div>" : "") +
+
+      '<div class="staff-fields">' +
+        '<div class="field"><label>Staff notes <span class="hint">(only staff see this)</span></label>' +
+          '<textarea data-f="staffNote" placeholder="Thread colours, who is making it, anything to remember…">' + esc(o.staffNote) + "</textarea></div>" +
+        '<div class="field"><label>Price quoted</label>' +
+          '<input type="text" data-f="price" inputmode="decimal" placeholder="$" value="' + esc(o.price || "") + '"></div>' +
+      "</div>" +
+
+      '<div class="actions">' +
+        (next ? '<button class="bigbtn ' + next.cls + '" data-act="next">' + next.label + "</button>" : "") +
+        (o.status === "ready" ? '<div class="more" style="grid-template-columns:1fr;"><a class="bigbtn small plain" href="sms:' + phone + "?&body=" + encodeURIComponent(readyMsg) + '">💬 Text the customer that it\'s ready</a></div>' : "") +
+        '<div class="more">' +
+          '<button class="bigbtn small plain" data-act="print">🖨 Print ticket</button>' +
+          (BACK[o.status] ? '<button class="bigbtn small plain" data-act="back">↩ ' + (o.status === "cancelled" ? "Bring this order back" : "Oops — move back a step") + "</button>" : "") +
+          (o.status !== "done" && o.status !== "cancelled" ? '<button class="bigbtn small danger" data-act="cancel">✖ Cancel order</button>' : "") +
+        "</div>" +
+      "</div></div>";
+    return h;
+  }
+
+  function inTab(o) { return tab === "done" ? (o.status === "done" || o.status === "cancelled") : o.status === tab; }
+
+  function render() {
+    var counts = { new: 0, making: 0, ready: 0, done: 0 };
+    orders.forEach(function (o) { counts[o.status === "cancelled" ? "done" : o.status]++; });
+    Object.keys(counts).forEach(function (k) { $("n-" + k).textContent = counts[k]; });
+    document.querySelectorAll(".tab").forEach(function (t) {
+      t.classList.toggle("active", t.getAttribute("data-s") === tab);
+      t.classList.toggle("has-new", t.getAttribute("data-s") === "new" && counts.new > 0);
+    });
+    document.title = (counts.new ? "(" + counts.new + " new) " : "") + "Orders | Everything Embroidered";
+
+    var q = $("search").value.trim().toLowerCase();
+    var list;
+    if (q) {
+      var qd = digits(q);
+      list = orders.filter(function (o) {
+        return o.customer.name.toLowerCase().indexOf(q) >= 0 || o.id.toLowerCase().indexOf(q) >= 0 ||
+               (qd.length >= 3 && digits(o.customer.phone).indexOf(qd) >= 0);
+      });
+    } else {
+      list = orders.filter(inTab);
+      // oldest first while there's work to do, newest first for finished
+      if (tab !== "done") list = list.slice().reverse();
+    }
+
+    var empty = {
+      new: ["🎉", "No new orders right now. You're all caught up!"],
+      making: ["🧵", "Nothing is being made right now."],
+      ready: ["✅", "Nothing is waiting for pickup."],
+      done: ["📦", "No finished orders yet."]
+    };
+    $("list").innerHTML = list.length
+      ? (q ? '<p style="color:#57534A;">Showing every order that matches “' + esc(q) + "”.</p>" : "") + list.map(orderHtml).join("")
+      : '<div class="card empty"><div class="ico">' + (q ? "🔍" : empty[tab][0]) + "</div>" + (q ? "No order matches that." : empty[tab][1]) + "</div>";
+  }
+
+  function beep() {
+    try {
+      var A = window.AudioContext || window.webkitAudioContext;
+      var a = new A(), o = a.createOscillator(), g = a.createGain();
+      o.connect(g); g.connect(a.destination);
+      o.frequency.value = 880; g.gain.value = 0.15;
+      o.start(); o.stop(a.currentTime + 0.25);
+    } catch (e) {}
+  }
+
+  function load(quiet) {
+    return EEStaff.api("/api/orders", { action: "list" }).then(function (data) {
+      $("problem").hidden = true;
+      var fresh = data.orders || [];
+      if (seen) {
+        var added = fresh.filter(function (o) { return o.status === "new" && !seen[o.id]; });
+        if (added.length) { beep(); EEStaff.toast(added.length === 1 ? "🔔 A new order just came in!" : "🔔 " + added.length + " new orders just came in!"); }
+      }
+      seen = {};
+      fresh.forEach(function (o) { seen[o.id] = 1; });
+      orders = fresh;
+      $("when").textContent = "Updated " + new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+      if (!editing) render();
+    }).catch(function (err) {
+      if (err.code === "auth") { location.reload(); return; }
+      $("problem").textContent = err.message;
+      $("problem").hidden = false;
+    });
+  }
+
+  function update(id, change, msg) {
+    return EEStaff.api("/api/orders", Object.assign({ action: "update", id: id }, change)).then(function (data) {
+      orders = orders.map(function (o) { return o.id === id ? data.order : o; });
+      if (msg) EEStaff.toast(msg);
+      return data.order;
+    }).catch(function (err) { EEStaff.toast(err.message); throw err; });
+  }
+
+  /* ---------- clicks ---------- */
+  $("tabs").addEventListener("click", function (e) {
+    var t = e.target.closest(".tab");
+    if (!t) return;
+    tab = t.getAttribute("data-s");
+    $("search").value = "";
+    render();
+    window.scrollTo({ top: 0 });
+  });
+  $("search").addEventListener("input", render);
+
+  $("list").addEventListener("click", function (e) {
+    var pic = e.target.closest(".pic");
+    if (pic) {
+      var z = document.createElement("div");
+      z.className = "zoom";
+      z.innerHTML = '<img src="' + esc(pic.getAttribute("data-full")) + '" alt="Design, full size">';
+      z.addEventListener("click", function () { z.remove(); });
+      document.body.appendChild(z);
+      return;
+    }
+    var btn = e.target.closest("[data-act]");
+    if (!btn) return;
+    var card = btn.closest(".order"), id = card.getAttribute("data-id");
+    var o = orders.filter(function (x) { return x.id === id; })[0];
+    var act = btn.getAttribute("data-act");
+
+    if (act === "print") {
+      card.classList.add("printing");
+      window.print();
+      setTimeout(function () { card.classList.remove("printing"); }, 500);
+      return;
+    }
+    if (act === "cancel" && !btn.classList.contains("confirm")) {
+      btn.classList.add("confirm");
+      btn.textContent = "Tap again to cancel this order";
+      setTimeout(function () { btn.classList.remove("confirm"); btn.textContent = "✖ Cancel order"; }, 4000);
+      return;
+    }
+    var to = act === "next" ? NEXT[o.status].to : act === "back" ? BACK[o.status] : "cancelled";
+    btn.disabled = true;
+    update(id, { status: to }, "Moved to “" + NAMES[to] + "”").then(render, function () { btn.disabled = false; });
+  });
+
+  // Notes and price save themselves when you tap away.
+  $("list").addEventListener("focusin", function (e) { if (e.target.hasAttribute("data-f")) editing = true; });
+  $("list").addEventListener("focusout", function (e) {
+    var f = e.target.getAttribute && e.target.getAttribute("data-f");
+    if (!f) return;
+    editing = false;
+    var id = e.target.closest(".order").getAttribute("data-id");
+    var o = orders.filter(function (x) { return x.id === id; })[0];
+    if (!o || (o[f] || "") === e.target.value.trim()) return;
+    var change = {}; change[f] = e.target.value;
+    update(id, change, "Saved ✓").catch(function () {});
+  });
+
+  EEStaff.requireLogin(function () {
+    load().then(function () {
+      // open on the first tab that has something in it
+      if (!orders.some(function (o) { return o.status === "new"; })) {
+        var first = ["making", "ready"].filter(function (s) { return orders.some(function (o) { return o.status === s; }); })[0];
+        if (first) { tab = first; render(); }
+      }
+    });
+    setInterval(function () { if (!document.hidden) load(true); }, 30000);
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) load(true); });
+  });
+})();
+</script>
+</body>
+</html>

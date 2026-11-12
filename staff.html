@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Home | Everything Embroidered</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="staff.css">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<style>
+  .hub { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .hub a {
+    background: #fff; border-radius: 20px; box-shadow: var(--shadow);
+    padding: 30px 24px; text-align: center; display: block;
+    border: 3px solid transparent; transition: border-color 0.15s ease, transform 0.15s ease;
+    position: relative;
+  }
+  .hub a:hover { border-color: var(--terracotta); transform: translateY(-2px); }
+  .hub .ico { font-size: 3rem; line-height: 1; margin-bottom: 12px; }
+  .hub .t { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 600; color: var(--navy); }
+  .hub .d { color: #57534A; font-size: 1.05rem; margin-top: 6px; }
+  .hub a.main { background: var(--terracotta); }
+  .hub a.main .t, .hub a.main .d { color: #fff; }
+  .badge {
+    position: absolute; top: 14px; right: 14px;
+    background: #B3261E; color: #fff; font-weight: 700; font-size: 1.1rem;
+    min-width: 40px; height: 40px; border-radius: 999px; padding: 0 12px;
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid #fff;
+  }
+</style>
+</head>
+<body class="big">
+
+<div class="top-bar">
+  <div class="name">Everything <span>Embroidered</span> · Staff</div>
+  <div class="links">
+    <a href="/">Website</a>
+    <button type="button" id="logout">Sign out</button>
+  </div>
+</div>
+
+<div class="page">
+  <h1>What would you like to do?</h1>
+  <p class="intro">Tap one of the big buttons.</p>
+
+  <div class="hub">
+    <a href="orders.html" class="main">
+      <span class="badge" id="newBadge" hidden></span>
+      <div class="ico">📋</div>
+      <div class="t">See orders</div>
+      <div class="d" id="ordersLine">Everything customers have ordered</div>
+    </a>
+    <a href="order.html?staff=1">
+      <div class="ico">🛒</div>
+      <div class="t">Take an order</div>
+      <div class="d">For a customer on the phone or at the counter</div>
+    </a>
+    <a href="mockup.html">
+      <div class="ico">👕</div>
+      <div class="t">Make a mockup</div>
+      <div class="d">Show a customer how their design will look</div>
+    </a>
+    <a href="upload.html">
+      <div class="ico">📸</div>
+      <div class="t">Add photos</div>
+      <div class="d">Put new work on the website</div>
+    </a>
+    <a href="admin.html">
+      <div class="ico">🗑️</div>
+      <div class="t">Remove photos</div>
+      <div class="d">Take old pictures off the website</div>
+    </a>
+  </div>
+</div>
+
+<script src="staff.js"></script>
+<script>
+(function () {
+  "use strict";
+  document.getElementById("logout").addEventListener("click", EEStaff.logout);
+  EEStaff.requireLogin(function () {
+    EEStaff.api("/api/orders", { action: "list" }).then(function (data) {
+      var n = (data.orders || []).filter(function (o) { return o.status === "new"; }).length;
+      if (n) {
+        var b = document.getElementById("newBadge");
+        b.textContent = n; b.hidden = false;
+        document.getElementById("ordersLine").textContent = n === 1 ? "1 new order is waiting" : n + " new orders are waiting";
+      }
+    }).catch(function () {});
+  });
+})();
+</script>
+</body>
+</html>

@@ -15,3 +15,13 @@
   X-Robots-Tag: noindex, nofollow
 /upload.html
   X-Robots-Tag: noindex, nofollow
+/staff*
+  X-Robots-Tag: noindex, nofollow
+/orders*
+  X-Robots-Tag: noindex, nofollow
+/order
+  X-Robots-Tag: noindex, nofollow
+/order.html
+  X-Robots-Tag: noindex, nofollow
+/mockup*
+  X-Robots-Tag: noindex, nofollow

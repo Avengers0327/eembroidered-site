@@ -193,3 +193,43 @@ One-time setup: Cloudflare dashboard → Workers & Pages → **eembroidered** �
 | `CLOUDINARY_API_SECRET` | same place |
 
 Then **Deployments → Retry deployment** on the latest one so it picks them up.
+
+---
+
+## Online orders (order page, staff order board, mockup tool)
+
+| Page | Who it's for |
+|---|---|
+| `/staff` | Staff home: big buttons for everything below |
+| `/orders` | Staff order board: New → Being made → Ready for pickup → Finished |
+| `/order` | Customer order page (staff-only until you open it) |
+| `/mockup` | Staff mockup tool: drag a logo onto a shirt, save or send the picture |
+
+### One-time setup in Cloudflare
+
+Orders are stored in a Cloudflare KV namespace (free).
+
+1. Cloudflare dashboard → **Storage & Databases → KV → Create** → name it `ee-orders`.
+2. **Workers & Pages → eembroidered → Settings → Bindings → Add → KV namespace**
+   - Variable name: `ORDERS` (exactly)
+   - Namespace: `ee-orders`
+3. Same Settings page → **Variables and Secrets**: make sure `ADMIN_PASSWORD` is set
+   (the same one the photo admin page uses). This is the staff password.
+4. **Deployments → Retry deployment** on the latest one.
+
+Each new order also emails the shop through the same Formspree form the Contact
+page uses. To turn that off, add a variable `NOTIFY_FORM_URL` with the value `off`.
+
+### Opening the order page to the public
+
+Open `shop-config.js`, change `open: false` to `open: true`, and push.
+Until then only signed-in staff can use `/order`; everyone else sees "coming soon".
+When you open it, add a link to `/order` in the site menu.
+
+Prices, products, colours and sizes are all in `shop-config.js` too.
+
+### Testing on your own computer
+
+    npx wrangler pages dev . --kv ORDERS
+
+with a `.dev.vars` file containing `ADMIN_PASSWORD=anything` and `NOTIFY_FORM_URL=off`.
