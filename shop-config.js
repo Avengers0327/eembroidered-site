@@ -1,11 +1,11 @@
 /* ==========================================================
-   THE SHOP — one file controls the whole online store.
+   THE SHOP â€” one file controls the whole online store.
 
-   • To OPEN the order page to the public: change  open: false
+   â€¢ To OPEN the order page to the public: change  open: false
      to  open: true  below, then push. That's the only switch:
      customers no longer need to sign in, and an "Order Online"
      link appears in the menu at the top of every page.
-   • To change a price or add a product: edit the list below.
+   â€¢ To change a price or add a product: edit the list below.
      "from" is the starting price shown to customers. The final
      price is always confirmed by staff before work starts.
    ========================================================== */

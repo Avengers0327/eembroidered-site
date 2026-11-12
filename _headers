@@ -27,3 +27,7 @@
   X-Robots-Tag: noindex, nofollow
 /staff-login*
   X-Robots-Tag: noindex, nofollow
+/*.js
+  Cache-Control: public, max-age=0, must-revalidate
+/*.css
+  Cache-Control: public, max-age=0, must-revalidate

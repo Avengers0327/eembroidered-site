@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Order Online | Everything Embroidered</title>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="staff.css">
+<link rel="stylesheet" href="style.css?v=202611112208">
+<link rel="stylesheet" href="staff.css?v=202611112208">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -174,9 +174,9 @@
 
 </div>
 
-<script src="gallery-config.js"></script>
-<script src="staff.js"></script>
-<script src="designer.js"></script>
+<script src="gallery-config.js?v=202611112208"></script>
+<script src="staff.js?v=202611112208"></script>
+<script src="designer.js?v=202611112208"></script>
 <script>
 (function () {
   "use strict";
@@ -314,8 +314,15 @@
       details: details, blob: null, files: has ? designer.getFiles() : []
     };
     var finish = function () { items.push(item); cur = null; paintCart(); show("cart"); };
-    if (has) designer.exportBlob().then(function (b) { item.blob = b; item.preview = URL.createObjectURL(b); finish(); });
-    else finish();
+    if (has) {
+      var nb = $("designNext");
+      nb.disabled = true; nb.textContent = "Saving your design…";
+      designer.exportBlob().then(function (b) {
+        item.blob = b; item.preview = URL.createObjectURL(b);
+        nb.disabled = false; nb.textContent = "Add this to my order →";
+        finish();
+      });
+    } else finish();
   });
 
   /* ---------- 4. cart ---------- */
